@@ -1,64 +1,99 @@
-import Image from "next/image";
+"use client";
+
+import { motion } from "framer-motion";
+import { ArrowRight, Sparkles, Zap, Shield } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="relative min-h-screen font-sans overflow-hidden">
+      {/* Dynamic Background Elements */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-brand-primary/20 blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-brand-secondary/20 blur-[120px]" />
+        <div className="absolute top-[40%] left-[30%] w-[20%] h-[20%] rounded-full bg-brand-accent/10 blur-[80px] animate-pulse-slow" />
+      </div>
+
+      {/* Main Content */}
+      <main className="relative z-10 flex min-h-screen flex-col items-center justify-center p-6 sm:p-24 text-center">
+
+        {/* Hero Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="max-w-4xl mx-auto flex flex-col items-center space-y-8"
+        >
+          {/* Badge */}
+          <div className="inline-flex items-center space-x-2 glass-panel px-4 py-2 rounded-full border-brand-primary/30">
+            <Sparkles className="w-4 h-4 text-brand-primary" />
+            <span className="text-sm font-medium tracking-wide text-brand-primary/90 uppercase">
+              The Next Evolution
+            </span>
+          </div>
+
+          {/* Headline */}
+          <h1 className="text-5xl sm:text-7xl font-bold font-heading tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/60">
+            Build Your Legacy in <br className="hidden sm:block" />
+            <span className="bg-clip-text text-transparent bg-gradient-dynamic text-glow">
+              Web3 Reality
+            </span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          <p className="max-w-2xl text-lg sm:text-xl text-foreground/70 leading-relaxed font-light">
+            MODUS is a tap-to-earn ecosystem where your characters evolve based on your on-chain interactions. Start building today.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full sm:w-auto">
+            <button className="glass-button bg-brand-primary/20 hover:bg-brand-primary/30 border-brand-primary/50 text-white px-8 py-4 flex items-center justify-center space-x-2 group">
+              <span className="font-semibold text-lg">Enter App</span>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button className="glass-button px-8 py-4 flex items-center justify-center space-x-2 text-foreground/80 hover:text-white">
+              <span className="font-semibold text-lg">Read Docs</span>
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Feature Cards Showcase */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl mt-32"
+        >
+          {[
+            {
+              title: "Lightning Fast",
+              desc: "Powered by Solana for sub-second finalized transactions and near-zero fees.",
+              icon: Zap,
+              color: "text-brand-primary"
+            },
+            {
+              title: "Secure Ownership",
+              desc: "Your characters and assets are fully verifiable on-chain NFTs.",
+              icon: Shield,
+              color: "text-brand-secondary"
+            },
+            {
+              title: "Evolving Traits",
+              desc: "Dynamic metadata updates as you progress through social tasks and referrals.",
+              icon: Sparkles,
+              color: "text-brand-accent"
+            }
+          ].map((feature, i) => (
+            <div key={i} className="glass-panel p-8 flex flex-col items-start space-y-4 hover:-translate-y-2 transition-transform duration-300">
+              <div className={`p-3 rounded-xl bg-white/5 border border-white/10 ${feature.color}`}>
+                <feature.icon className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-heading font-semibold text-white">{feature.title}</h3>
+              <p className="text-foreground/60 text-left font-light leading-relaxed">
+                {feature.desc}
+              </p>
+            </div>
+          ))}
+        </motion.div>
+
       </main>
     </div>
   );
