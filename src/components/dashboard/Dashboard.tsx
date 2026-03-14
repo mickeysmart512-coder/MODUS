@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Activity, Coins, Users, ArrowUpRight, Zap, Loader2, Bell, Lock, Calendar, AlertTriangle } from "lucide-react";
+import { Activity, Coins, Users, ArrowUpRight, Zap, Loader2, Bell, Lock, Calendar, AlertTriangle, Sparkles } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { supabase, User, Activity as SupabaseActivity, Announcement, SystemSettings } from "@/lib/supabase";
 import { formatDistanceToNow } from 'date-fns';
