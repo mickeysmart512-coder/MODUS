@@ -61,11 +61,14 @@ export const useAuthStore = create<AuthState>()(
 
                 try {
                     // Fetch user profile
-                    let { data: user, error: userError } = await supabase
+                    const response = await supabase
                         .from('users')
                         .select('*')
                         .eq('wallet_address', walletAddress)
                         .single();
+
+                    let user = response.data;
+                    const userError = response.error;
 
                     // Auto-create user if they don't exist yet
                     if (userError?.code === 'PGRST116' || !user) {

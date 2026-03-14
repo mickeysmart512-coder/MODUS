@@ -123,7 +123,7 @@ export default function SeasonsManager() {
                                 <label className="block text-sm text-white/70 mb-2">Select Next Season</label>
                                 <select
                                     value={selectedSeason}
-                                    onChange={(e) => setSelectedSeason(e.target.value as any)}
+                                    onChange={(e) => setSelectedSeason(e.target.value as SystemSettings["active_season"])}
                                     className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white outline-none focus:border-brand-accent"
                                     disabled={isCountdownActive}
                                 >

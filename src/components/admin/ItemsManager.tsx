@@ -119,7 +119,7 @@ export default function ItemsManager() {
                                 </div>
                                 <div className="flex-1">
                                     <label className="block text-sm text-white/70 mb-1">Currency Type</label>
-                                    <select value={newItem.currency_type} onChange={e => setNewItem({ ...newItem, currency_type: e.target.value as any })} className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white outline-none focus:border-brand-primary">
+                                    <select value={newItem.currency_type} onChange={e => setNewItem({ ...newItem, currency_type: e.target.value as "crypto" | "credits" })} className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white outline-none focus:border-brand-primary">
                                         <option value="crypto">Crypto (SOL)</option>
                                         <option value="credits">Credits</option>
                                     </select>
