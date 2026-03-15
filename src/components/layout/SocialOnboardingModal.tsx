@@ -30,25 +30,7 @@ export default function SocialOnboardingModal({ isOpen, onClose }: SocialOnboard
 
             if (error) {
                 console.error("Error connecting to X:", error);
-
-                // If it's the unsupported provider error, let's offer a mock login for testing
-                if (error.message.includes("Unsupported provider") || error.message.includes("provider is not enabled")) {
-                    const useMock = window.confirm(
-                        "Twitter OAuth is not enabled in your Supabase project.\n\n" +
-                        "To fix for production: Go to Supabase > Authentication > Providers > Enable Twitter.\n\n" +
-                        "Would you like to proceed with a MOCK login for testing purposes right now?"
-                    );
-
-                    if (useMock) {
-                        setXConnected(true);
-                        setTimeout(() => {
-                            alert("Mock Login Successful! You are now 'connected' as @tester.");
-                        }, 500);
-                    }
-                } else {
-                    alert(`Error connecting to X: ${error.message}\nMake sure Twitter OAuth is enabled in Supabase!`);
-                }
-
+                alert(`Error connecting to X: ${error.message}\nMake sure Twitter OAuth is enabled in Supabase!`);
                 setIsConnecting(false);
             }
         } catch (err) {
@@ -144,17 +126,6 @@ export default function SocialOnboardingModal({ isOpen, onClose }: SocialOnboard
                                                         <ArrowRight className="w-4 h-4" />
                                                     </>
                                                 )}
-                                            </button>
-
-                                            {/* Dev/Testing Fallback */}
-                                            <button
-                                                onClick={() => {
-                                                    setXConnected(true);
-                                                    alert("Mock Login Successful! You are now 'connected'.");
-                                                }}
-                                                className="bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-xl px-3 text-xs font-semibold transition-colors"
-                                            >
-                                                MOCK
                                             </button>
                                         </div>
                                     )}
