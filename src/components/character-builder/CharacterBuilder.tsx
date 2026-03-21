@@ -16,7 +16,7 @@ import {
 
 type Gender = "male" | "female" | null;
 
-export default function CharacterBuilder() {
+export default function CharacterBuilder({ previewOnly = false }: { previewOnly?: boolean }) {
     const { connection } = useConnection();
     const { publicKey, sendTransaction } = useWallet();
     const { inventory, addToInventory, spendCredits, credits, powerLevel } = useAuthStore();
