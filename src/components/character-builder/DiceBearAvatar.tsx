@@ -72,16 +72,16 @@ export default function DiceBearAvatar({
         const avatar = createAvatar(avataaars, {
             seed,
             backgroundColor: ["b6e3f4", "c0aede", "d1d4f9", "ffd5dc", "ffdfbf"],
-            skinColor: [avatarTraits.skinColor],
-            top: [avatarTraits.hair], 
-            hairColor: [avatarTraits.hairColor],
-            facialHair: [avatarTraits.facialHair],
-            clothing: [activeClothing],
-            clothingColor: [activeClothingColor],
-            eyes: [avatarTraits.eyes],
-            eyebrows: [avatarTraits.eyebrows],
-            mouth: [avatarTraits.mouth],
-            accessories: [activeAccessories]
+            skinColor: [avatarTraits.skinColor] as any,
+            top: [avatarTraits.hair] as any, 
+            hairColor: [avatarTraits.hairColor] as any,
+            facialHair: [avatarTraits.facialHair] as any,
+            clothing: [activeClothing] as any,
+            clothesColor: [activeClothingColor] as any,
+            eyes: [avatarTraits.eyes] as any,
+            eyebrows: [avatarTraits.eyebrows] as any,
+            mouth: [avatarTraits.mouth] as any,
+            accessories: [activeAccessories] as any
         });
 
         return avatar.toString();
