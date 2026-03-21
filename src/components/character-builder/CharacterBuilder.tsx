@@ -237,7 +237,6 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
                                 <DiceBearAvatar 
                                     seed={publicKey?.toBase58() || "guest-player-1"} 
                                     equippedItems={equippedItems} 
-                                    powerLevel={powerLevel}
                                 />
                                 
                                 {/* Buttery Smooth Framer Motion Equipment Layers */}
