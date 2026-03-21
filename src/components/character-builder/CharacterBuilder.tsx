@@ -7,7 +7,7 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { createUpgradeTransaction } from "@/lib/solana";
 import { supabase, Item, SystemSettings } from "@/lib/supabase";
 import { useAuthStore } from "@/store/useAuthStore";
-import { MaleBase, FemaleBase } from "./layers/BaseCharacters";
+import DiceBearAvatar from "./DiceBearAvatar";
 import {
     NeonVisorLayer, CyberHelmLayer,
     PlasmaCoreLayer, TitaniumShellLayer,
@@ -24,7 +24,7 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
     const { connection } = useConnection();
     const { publicKey, sendTransaction } = useWallet();
     const { inventory, addToInventory, spendCredits, credits, powerLevel } = useAuthStore();
-    const [gender, setGender] = useState<Gender>(null);
+    const [gender, setGender] = useState<Gender>("male"); // Auto-init to bypass the old selection screen
     const [selectedTrait, setSelectedTrait] = useState("head");
     const [activeItem, setActiveItem] = useState<number | null>(null);
     const [isEquipping, setIsEquipping] = useState(false);
@@ -198,7 +198,7 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
             <div className="w-full h-full flex flex-col items-center justify-center relative overflow-hidden group cursor-default">
                 <div className="absolute inset-0 bg-brand-primary/20 blur-[80px] -z-10 group-hover:bg-brand-secondary/30 transition-colors duration-1000" />
                 <div className="w-[80%] max-w-[300px] aspect-[2/3] relative z-10 drop-shadow-[0_0_30px_rgba(139,92,246,0.6)]">
-                    <MaleBase />
+                    <DiceBearAvatar seed="preview-hero-seed" />
                     <div className="absolute inset-0 pointer-events-none">
                         <NeonVisorLayer />
                         <VoidBladeLayer />
@@ -208,29 +208,7 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
             </div>
         );
     }
-
-    if (!gender) {
-        return (
-            <div className="w-full max-w-4xl mx-auto space-y-8 flex flex-col items-center justify-center min-h-[60vh]">
-                <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold text-white font-heading mb-4">Initialize Character</h2>
-                    <p className="text-foreground/60 max-w-lg">
-                        Before entering the forge, select your Base Avatar. Custom layered AI mapping begins hereafter.
-                    </p>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-2xl px-4">
-                    <motion.button onClick={() => setGender('male')} className="glass-panel p-8 flex flex-col items-center justify-center space-y-6 border-white/10 hover:border-brand-primary/50 transition-colors group">
-                        <div className="w-48 h-64 relative bg-black/20 rounded-xl overflow-hidden group-hover:bg-brand-primary/5 transition-colors"><MaleBase /></div>
-                        <h3 className="text-2xl font-bold font-heading text-white">Male Base</h3>
-                    </motion.button>
-                    <motion.button onClick={() => setGender('female')} className="glass-panel p-8 flex flex-col items-center justify-center space-y-6 border-white/10 hover:border-brand-secondary/50 transition-colors group">
-                        <div className="w-48 h-64 relative bg-black/20 rounded-xl overflow-hidden group-hover:bg-brand-secondary/5 transition-colors"><FemaleBase /></div>
-                        <h3 className="text-2xl font-bold font-heading text-white">Female Base</h3>
-                    </motion.button>
-                </div>
-            </div>
-        );
-    }
+    // Auto-initialized via wallet seed.
 
     const renderedHeadId = getRenderedItemId("head");
     const renderedBodyId = getRenderedItemId("body");
@@ -254,16 +232,43 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
                             // Render AI composite if created
                             <img src={layeredAvatarUrl} alt="AI Avatar" className="w-full h-full object-contain" />
                         ) : (
-                            // Render Base SVG Stack normally
+                            // Render DiceBear Base Avatar natively
                             <div className="absolute inset-0 z-0">
-                                {gender === 'male' ? <MaleBase /> : <FemaleBase />}
-                                <div className="absolute inset-0 pointer-events-none">
-                                    {/* Fallback legacy components for some items */}
-                                    {renderedBodyId === 4 && <PlasmaCoreLayer />}
-                                    {renderedBodyId === 5 && <TitaniumShellLayer />}
-                                    {renderedHeadId === 1 && <NeonVisorLayer />}
-                                    {renderedHeadId === 2 && <CyberHelmLayer />}
-                                    {renderedWeaponId === 6 && <VoidBladeLayer />}
+                                <DiceBearAvatar 
+                                    seed={publicKey?.toBase58() || "guest-player-1"} 
+                                    equippedItems={equippedItems} 
+                                    powerLevel={powerLevel}
+                                />
+                                
+                                {/* Buttery Smooth Framer Motion Equipment Layers */}
+                                <div className="absolute inset-0 pointer-events-none overflow-visible">
+                                    <AnimatePresence>
+                                        {renderedBodyId === 4 && (
+                                            <motion.div key="body-4" initial={{ opacity: 0, scale: 1.1, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ type: "spring", bounce: 0.4 }} className="absolute inset-0">
+                                                <PlasmaCoreLayer />
+                                            </motion.div>
+                                        )}
+                                        {renderedBodyId === 5 && (
+                                            <motion.div key="body-5" initial={{ opacity: 0, scale: 1.1, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ type: "spring", bounce: 0.4 }} className="absolute inset-0">
+                                                <TitaniumShellLayer />
+                                            </motion.div>
+                                        )}
+                                        {renderedHeadId === 1 && (
+                                            <motion.div key="head-1" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ type: "spring", bounce: 0.5 }} className="absolute inset-0">
+                                                <NeonVisorLayer />
+                                            </motion.div>
+                                        )}
+                                        {renderedHeadId === 2 && (
+                                            <motion.div key="head-2" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ type: "spring", bounce: 0.5 }} className="absolute inset-0">
+                                                <CyberHelmLayer />
+                                            </motion.div>
+                                        )}
+                                        {renderedWeaponId === 6 && (
+                                            <motion.div key="weap-6" initial={{ opacity: 0, x: -30, rotate: -20 }} animate={{ opacity: 1, x: 0, rotate: 0 }} exit={{ opacity: 0, x: -30, rotate: -20 }} transition={{ type: "spring", bounce: 0.6 }} className="absolute inset-0 drop-shadow-[0_0_20px_rgba(139,92,246,0.8)]">
+                                                <VoidBladeLayer />
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
                             </div>
                         )}
