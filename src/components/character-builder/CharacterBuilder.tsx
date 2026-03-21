@@ -16,7 +16,11 @@ import {
 
 type Gender = "male" | "female" | null;
 
-export default function CharacterBuilder() {
+interface CharacterBuilderProps {
+    previewOnly?: boolean;
+}
+
+export default function CharacterBuilder({ previewOnly = false }: CharacterBuilderProps) {
     const { connection } = useConnection();
     const { publicKey, sendTransaction } = useWallet();
     const { inventory, addToInventory, spendCredits, credits, powerLevel } = useAuthStore();
@@ -188,6 +192,22 @@ export default function CharacterBuilder() {
         if (activeItemData && matchesType(activeItemData)) return activeItem;
         return equippedItems[type];
     };
+
+    if (previewOnly) {
+        return (
+            <div className="w-full h-full flex flex-col items-center justify-center relative overflow-hidden group cursor-default">
+                <div className="absolute inset-0 bg-brand-primary/20 blur-[80px] -z-10 group-hover:bg-brand-secondary/30 transition-colors duration-1000" />
+                <div className="w-[80%] max-w-[300px] aspect-[2/3] relative z-10 drop-shadow-[0_0_30px_rgba(139,92,246,0.6)]">
+                    <MaleBase />
+                    <div className="absolute inset-0 pointer-events-none">
+                        <NeonVisorLayer />
+                        <VoidBladeLayer />
+                        <PlasmaCoreLayer />
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     if (!gender) {
         return (

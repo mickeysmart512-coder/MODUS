@@ -37,7 +37,7 @@ export default function Home() {
             </div>
 
             {/* Headline */}
-            <h1 className="text-5xl sm:text-7xl font-bold font-heading tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/60">
+            <h1 className="text-4xl sm:text-7xl font-bold font-heading tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/60 leading-[1.1] sm:leading-tight">
               Build Your Legacy in <br className="hidden sm:block" />
               <span className="bg-clip-text text-transparent bg-gradient-dynamic text-glow">
                 Web3 Reality
@@ -81,10 +81,10 @@ export default function Home() {
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
-                className="w-full h-full relative z-10"
+                className="w-full h-full relative z-10 flex items-center justify-center pt-4"
               >
                 <AnimatePresence mode="wait">
-                  <CharacterBuilder />
+                  <CharacterBuilder previewOnly />
                 </AnimatePresence>
               </motion.div>
             </div>

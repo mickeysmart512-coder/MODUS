@@ -146,21 +146,25 @@ export default function TopNav() {
                         </div>
                     </div>
 
-                    {/* Mobile menu simple icon list */}
-                    <div className="flex md:hidden items-center space-x-4">
+                    {/* Mobile menu bottom tab bar */}
+                    <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-xl border-t border-white/10 p-3 pb-safe flex md:hidden items-center justify-around z-50">
                         {navItems.map((item) => (
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`p-2 rounded-full ${pathname === item.href ? "bg-white/10 text-white" : "text-foreground/60"
+                                className={`flex flex-col items-center justify-center p-2 rounded-xl transition-colors min-w-[64px] ${pathname === item.href ? "text-brand-primary" : "text-foreground/50 hover:text-white"
                                     }`}
                             >
-                                <item.icon className="w-5 h-5" />
+                                <item.icon className="w-6 h-6 mb-1" />
+                                <span className="text-[10px] font-bold tracking-wide uppercase">{item.name}</span>
                             </Link>
                         ))}
                     </div>
                 </div>
             </nav>
+
+            {/* Spacer for bottom nav on mobile */}
+            <div className="block md:hidden pb-20" />
 
             <SocialOnboardingModal
                 isOpen={isSocialModalOpen}
