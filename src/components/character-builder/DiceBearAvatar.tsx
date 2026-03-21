@@ -46,6 +46,17 @@ const defaultTraits: AvatarTraits = {
     accessories: "blank",
 };
 
+// Avataaars engine strictly expects 6-digit hex values for skin color
+const SKIN_COLOR_MAP: Record<string, string> = {
+    pale: "ffdfbf",
+    light: "fd9841",
+    yellow: "f8d25c",
+    tanned: "d08b5b",
+    brown: "ae5d29",
+    darkBrown: "614335",
+    black: "2b1d16"
+};
+
 export default function DiceBearAvatar({ 
     seed, 
     width = "100%", 
@@ -72,7 +83,7 @@ export default function DiceBearAvatar({
         const avatar = createAvatar(avataaars, {
             seed,
             backgroundColor: ["b6e3f4", "c0aede", "d1d4f9", "ffd5dc", "ffdfbf"],
-            skinColor: [avatarTraits.skinColor] as any,
+            skinColor: [SKIN_COLOR_MAP[avatarTraits.skinColor] || "d08b5b"] as any,
             top: [avatarTraits.hair] as any, 
             hairColor: [avatarTraits.hairColor] as any,
             facialHair: [avatarTraits.facialHair] as any,
