@@ -102,7 +102,7 @@ export default function TopNav() {
                     </div>
 
                     {/* Wallet Connect Button / Gated Social Login */}
-                    <div className="flex items-center">
+                    <div className="flex items-center space-x-4">
                         <AnimatePresence mode="wait">
                             {!isSocialOnboardingComplete ? (
                                 <motion.button
@@ -111,36 +111,39 @@ export default function TopNav() {
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.9 }}
                                     onClick={() => setIsSocialModalOpen(true)}
-                                    className="bg-brand-primary hover:bg-brand-primary/90 text-white px-5 py-2 rounded-full font-medium transition-colors shadow-[0_0_15px_rgba(139,92,246,0.5)] font-heading"
+                                    className="bg-brand-primary hover:bg-brand-primary/90 text-white px-5 py-2 rounded-full font-medium transition-colors shadow-[0_0_15px_rgba(139,92,246,0.5)] font-heading text-sm"
                                 >
                                     Login with X
                                 </motion.button>
                             ) : (
                                 <motion.div
-                                    key="wallet-button"
+                                    key="user-profile"
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
-                                    className="flex items-center space-x-4"
+                                    className="flex items-center"
                                 >
-                                    {isSocialOnboardingComplete && (
-                                        <div className="hidden sm:flex items-center space-x-3 bg-white/5 py-1 px-3 rounded-full border border-white/10">
-                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm border transition-all ${powerLevel >= 20000 ? 'bg-brand-accent/20 text-brand-accent border-brand-accent shadow-[0_0_15px_rgba(20,241,149,0.8)]' : 'bg-brand-primary/20 text-brand-primary border-brand-primary/30'}`}>
-                                                <User className="w-4 h-4" />
-                                            </div>
-                                            <span className={`text-sm font-medium pr-2 text-white ${powerLevel >= 20000 && 'drop-shadow-[0_0_5px_rgba(20,241,149,0.8)]'}`}>{username && username.startsWith('@') ? username : '@X_Linked'}</span>
+                                    <div className="hidden sm:flex items-center space-x-3 bg-white/5 py-1 px-3 rounded-full border border-white/10">
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm border transition-all ${powerLevel >= 20000 ? 'bg-brand-accent/20 text-brand-accent border-brand-accent shadow-[0_0_15px_rgba(20,241,149,0.8)]' : 'bg-brand-primary/20 text-brand-primary border-brand-primary/30'}`}>
+                                            <User className="w-4 h-4" />
                                         </div>
-                                    )}
-                                    <WalletMultiButton style={{
-                                        backgroundColor: 'var(--color-brand-primary)',
-                                        borderRadius: '9999px',
-                                        padding: '0 20px',
-                                        height: '40px',
-                                        fontFamily: 'var(--font-heading)',
-                                        fontWeight: 600,
-                                    }} />
+                                        <span className={`text-sm font-medium pr-2 text-white ${powerLevel >= 20000 && 'drop-shadow-[0_0_5px_rgba(20,241,149,0.8)]'}`}>{username && username.startsWith('@') ? username : '@X_Linked'}</span>
+                                    </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>
+
+                        {/* Wallet Button - Always visible, conditionally disabled */}
+                        <div className={`transition-all duration-300 ${!isSocialOnboardingComplete ? "opacity-40 grayscale blur-[0.5px] pointer-events-none" : ""}`}>
+                            <WalletMultiButton style={{
+                                backgroundColor: 'var(--color-brand-primary)',
+                                borderRadius: '9999px',
+                                padding: '0 20px',
+                                height: '40px',
+                                fontSize: '14px',
+                                fontFamily: 'var(--font-heading)',
+                                fontWeight: 600,
+                            }} />
+                        </div>
                     </div>
 
                     {/* Mobile menu simple icon list */}
