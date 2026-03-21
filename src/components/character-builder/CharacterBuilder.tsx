@@ -87,6 +87,7 @@ export default function CharacterBuilder({ previewOnly = false }: { previewOnly?
     const handlePurchase = async () => {
         if (!activeItemData || !publicKey || !systemSettings) return;
         setIsEquipping(true);
+        try {
             if (activeItemData.currency_type === 'crypto') {
                 const tx = await createUpgradeTransaction(connection, publicKey, activeItemData.price, systemSettings.admin_wallet_address);
                 const txSignature = await sendTransaction(tx, connection);
