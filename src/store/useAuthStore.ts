@@ -20,7 +20,24 @@ interface AuthState {
     powerLevel: number;
     accountLevel: number;
 
+    // Avatar Configuration State
+    avatarConfig: {
+        skinColor: string[];
+        top: string;
+        hairColor: string[];
+        clothing: string;
+        clothesColor: string[];
+        eyes: string;
+        eyebrows: string;
+        mouth: string;
+        facialHair: string;
+        facialHairColor: string[];
+        accessories: string;
+        accessoriesColor: string[];
+    };
+
     setWallet: (address: string | null) => void;
+    setAvatarConfig: (config: Partial<AuthState['avatarConfig']>) => void;
     setUsername: (name: string) => void;
     setXConnected: (status: boolean) => void;
     setHasFollowedProject: (status: boolean) => void;
@@ -45,6 +62,25 @@ export const useAuthStore = create<AuthState>()(
             modTokens: 0,
             powerLevel: 0,
             accountLevel: 1,
+
+            avatarConfig: {
+                skinColor: ["edb98a"],
+                top: "shortFlat",
+                hairColor: ["2c1b18"],
+                clothing: "hoodie",
+                clothesColor: ["3c4f5c"],
+                eyes: "default",
+                eyebrows: "defaultNatural",
+                mouth: "smile",
+                facialHair: "none",
+                facialHairColor: ["2c1b18"],
+                accessories: "none",
+                accessoriesColor: ["262e33"]
+            },
+
+            setAvatarConfig: (newConfig) => set((state) => ({ 
+                avatarConfig: { ...state.avatarConfig, ...newConfig } 
+            })),
 
             setWallet: async (address) => {
                 set({ walletAddress: address });

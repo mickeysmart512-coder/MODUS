@@ -1,0 +1,133 @@
+{
+  "accessories": [
+    "kurt",
+    "prescription01",
+    "prescription02",
+    "round",
+    "sunglasses",
+    "wayfarers",
+    "eyepatch"
+  ],
+  "accessoriesProbability": "integer",
+  "base": [
+    "default"
+  ],
+  "clothing": [
+    "blazerAndShirt",
+    "blazerAndSweater",
+    "collarAndSweater",
+    "graphicShirt",
+    "hoodie",
+    "overall",
+    "shirtCrewNeck",
+    "shirtScoopNeck",
+    "shirtVNeck"
+  ],
+  "clothingGraphic": [
+    "bat",
+    "bear",
+    "cumbia",
+    "deer",
+    "diamond",
+    "hola",
+    "pizza",
+    "resist",
+    "skull",
+    "skullOutline"
+  ],
+  "eyebrows": [
+    "angryNatural",
+    "defaultNatural",
+    "flatNatural",
+    "frownNatural",
+    "raisedExcitedNatural",
+    "sadConcernedNatural",
+    "unibrowNatural",
+    "upDownNatural",
+    "angry",
+    "default",
+    "raisedExcited",
+    "sadConcerned",
+    "upDown"
+  ],
+  "eyes": [
+    "closed",
+    "cry",
+    "default",
+    "eyeRoll",
+    "happy",
+    "hearts",
+    "side",
+    "squint",
+    "surprised",
+    "winkWacky",
+    "wink",
+    "xDizzy"
+  ],
+  "facialHair": [
+    "beardLight",
+    "beardMajestic",
+    "beardMedium",
+    "moustacheFancy",
+    "moustacheMagnum"
+  ],
+  "facialHairProbability": "integer",
+  "mouth": [
+    "concerned",
+    "default",
+    "disbelief",
+    "eating",
+    "grimace",
+    "sad",
+    "screamOpen",
+    "serious",
+    "smile",
+    "tongue",
+    "twinkle",
+    "vomit"
+  ],
+  "nose": [
+    "default"
+  ],
+  "style": [
+    "circle",
+    "default"
+  ],
+  "top": [
+    "hat",
+    "hijab",
+    "turban",
+    "winterHat1",
+    "winterHat02",
+    "winterHat03",
+    "winterHat04",
+    "bob",
+    "bun",
+    "curly",
+    "curvy",
+    "dreads",
+    "frida",
+    "fro",
+    "froBand",
+    "longButNotTooLong",
+    "miaWallace",
+    "shavedSides",
+    "straight02",
+    "straight01",
+    "straightAndStrand",
+    "dreads01",
+    "dreads02",
+    "frizzle",
+    "shaggy",
+    "shaggyMullet",
+    "shortCurly",
+    "shortFlat",
+    "shortRound",
+    "shortWaved",
+    "sides",
+    "theCaesar",
+    "theCaesarAndSidePart",
+    "bigHair"
+  ],
+  "topProbability": "integer"
+}
