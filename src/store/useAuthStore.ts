@@ -2,6 +2,19 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { supabase } from '@/lib/supabase';
 
+interface AvatarTraits {
+    skinColor: string;
+    hair: string;
+    hairColor: string;
+    facialHair: string;
+    clothing: string;
+    clothingColor: string;
+    eyes: string;
+    eyebrows: string;
+    mouth: string;
+    accessories: string;
+}
+
 interface AuthState {
     walletAddress: string | null;
     username: string | null;
@@ -25,6 +38,11 @@ interface AuthState {
     setXConnected: (status: boolean) => void;
     setHasFollowedProject: (status: boolean) => void;
     setIsAdmin: (status: boolean) => void;
+    
+    // Avatar Forge State
+    avatarTraits: AvatarTraits;
+    setAvatarTrait: (trait: keyof AvatarTraits, value: string) => void;
+    
     addToInventory: (itemIds: number[], powerAdded?: number) => Promise<void>;
     spendCredits: (amount: number, description: string) => Promise<boolean>;
     disconnect: () => void;
@@ -45,6 +63,19 @@ export const useAuthStore = create<AuthState>()(
             modTokens: 0,
             powerLevel: 0,
             accountLevel: 1,
+
+            avatarTraits: {
+                skinColor: "pale",
+                hair: "shortHairShortFlat",
+                hairColor: "brownDark",
+                facialHair: "blank",
+                clothing: "hoodie",
+                clothingColor: "black",
+                eyes: "happy",
+                eyebrows: "defaultNatural",
+                mouth: "smile",
+                accessories: "blank",
+            },
 
             setWallet: async (address) => {
                 set({ walletAddress: address });
@@ -127,6 +158,13 @@ export const useAuthStore = create<AuthState>()(
             setXConnected: (status) => set({ isXConnected: status }),
             setHasFollowedProject: (status) => set({ hasFollowedProject: status }),
             setIsAdmin: (status) => set({ isAdmin: status }),
+
+            setAvatarTrait: (trait, value) => set((state) => ({
+                avatarTraits: {
+                    ...state.avatarTraits,
+                    [trait]: value
+                }
+            })),
 
             addToInventory: async (itemIds, powerAdded = 0) => {
                 const state = get();
