@@ -39,6 +39,7 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
 
     // Dynamic AI Avatar URL
     const [layeredAvatarUrl, setLayeredAvatarUrl] = useState<string | null>(null);
+    const [isSynthesizing, setIsSynthesizing] = useState(false);
 
     // Track officially equipped items vs just previewed items
     const [equippedItems, setEquippedItems] = useState<{
@@ -79,23 +80,32 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
     const activeItemData = items.find(i => i.id === activeItem);
     const isOwned = activeItemData ? inventory.includes(activeItemData.id) : false;
 
-    // Call AI Endpoint to layer the avatar visually
-    const synthesizeAvatarWithAI = async (itemId: number) => {
-        const itemImg = items.find(i => i.id === itemId)?.image_url;
-        if (!itemImg) return;
-
+    // Call AI Endpoint to synthesize a fully 3D realistic avatar
+    const handleSynthesize = async () => {
+        setIsSynthesizing(true);
         try {
-            const res = await fetch('/api/ai/layer-avatar', {
+            const res = await fetch('/api/ai/synthesize', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ avatarUrl: "base_avatar", itemUrl: itemImg })
+                body: JSON.stringify({ config: avatarConfig, equippedItems })
             });
             const data = await res.json();
-            if (data.success && data.layeredAvatarUrl !== "base_avatar") {
+            if (data.success && data.layeredAvatarUrl) {
                 setLayeredAvatarUrl(data.layeredAvatarUrl);
             }
         } catch (error) {
-            console.error("AI Layering failed", error);
+            console.error("AI Synthesis failed", error);
+            alert("Failed to synthesize the 3D character.");
+        } finally {
+            setIsSynthesizing(false);
+        }
+    };
+
+    // Reset synthesis if they change equipped logic (optional, but let's keep it simple for now)
+    const synthesizeAvatarWithAI = async (itemId: number) => {
+        // We will just clear the synthesized image if they equip something new to show dynamic changes again
+        if (layeredAvatarUrl) {
+           setLayeredAvatarUrl(null);
         }
     };
 
@@ -228,6 +238,12 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
         if (activeMasterTab === 'face') setActiveSubTab('skinColor');
         if (activeMasterTab === 'style') setActiveSubTab('clothing');
         if (activeMasterTab === 'forge') setActiveSubTab('head');
+        
+        // If they change tabs, it might mean they want to modify the character, 
+        // return back to 2D view so they can see changes
+        if (layeredAvatarUrl && !isSynthesizing) {
+            setLayeredAvatarUrl(null);
+        }
     }, [activeMasterTab]);
 
     const masterTabs = [
@@ -255,7 +271,7 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
             {options.map(c => (
                 <button 
                     key={c.value} 
-                    onClick={() => setAvatarConfig({ [configKey]: [c.value] })}
+                    onClick={() => { setAvatarConfig({ [configKey]: [c.value] }); setLayeredAvatarUrl(null); }}
                     title={c.name}
                     className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-lg ${avatarConfig && (avatarConfig as any)[configKey]?.[0] === c.value ? 'ring-2 ring-brand-primary ring-offset-2 ring-offset-[#0B0F19] scale-110' : 'hover:scale-110 opacity-80'}`}
                     style={{ backgroundColor: `#${c.value}` }}
@@ -269,7 +285,7 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
             {options.map(opt => (
                 <button 
                     key={opt}
-                    onClick={() => setAvatarConfig({ [configKey]: opt })}
+                    onClick={() => { setAvatarConfig({ [configKey]: opt }); setLayeredAvatarUrl(null); }}
                     className={`p-3 rounded-xl border transition-all text-xs font-medium truncate ${avatarConfig && (avatarConfig as any)[configKey] === opt ? 'bg-brand-primary/20 border-brand-primary text-white shadow-[0_0_15px_rgba(139,92,246,0.3)]' : 'bg-white/5 border-white/10 text-foreground/70 hover:bg-white/10 hover:text-white'}`}
                 >
                     {opt.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
@@ -346,6 +362,22 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
                             </div>
                         </div>
                     </div>
+
+                    {/* Synthesize Button */}
+                    <button 
+                        onClick={handleSynthesize}
+                        disabled={isSynthesizing}
+                        className="w-full mt-4 glass-button bg-brand-accent/20 hover:bg-brand-accent/30 border-brand-accent/50 min-h-[60px] rounded-2xl flex items-center justify-center space-x-2 transition-all group overflow-hidden relative"
+                    >
+                        {isSynthesizing && (
+                           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-brand-accent/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+                        )}
+                        {isSynthesizing ? (
+                            <><Loader2 className="w-5 h-5 animate-spin text-brand-accent" /><span className="font-bold text-brand-accent">Synthesizing 3D Avatar...</span></>
+                        ) : (
+                            <><Wand2 className="w-5 h-5 group-hover:rotate-12 transition-transform text-white" /><span className="font-bold tracking-wide text-white">Synthesize 3D Character ✨</span></>
+                        )}
+                    </button>
                 </div>
 
                 {/* Right Column: Customization Studio */}
