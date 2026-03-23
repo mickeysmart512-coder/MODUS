@@ -299,11 +299,11 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-panel p-4 sm:p-8 flex flex-col lg:flex-row gap-8 min-h-[70vh]">
 
                 {/* Left Column: Fixed Character Preview Area */}
-                <div className="lg:w-2/5 flex flex-col items-center justify-between p-8 rounded-[40px] bg-[#05070B] border border-white/5 relative overflow-hidden group shadow-[inset_0_0_50px_rgba(0,0,0,0.5)] h-[600px] lg:sticky lg:top-24">
+                <div className="lg:w-2/5 flex flex-col items-center justify-between p-8 rounded-[40px] bg-[#05070B] border border-white/5 relative overflow-hidden group shadow-[inset_0_0_50px_rgba(0,0,0,0.5)] min-h-[600px] lg:sticky lg:top-24">
                     <div className="absolute inset-0 bg-brand-primary/10 blur-[100px] -z-10 transition-colors duration-500" />
 
                     {/* Highly dynamic rendering area + PWR DP effect! */}
-                    <div className={`w-full max-w-[320px] aspect-[2/3] relative z-10 p-2 transition-all duration-700 mt-4 flex-1 flex items-center justify-center ${powerLevel >= 20000 ? 'border-[3px] border-brand-accent shadow-[0_0_50px_rgba(20,241,149,0.8)] rounded-full' : 'drop-shadow-2xl'}`}>
+                    <div className={`w-full max-w-[320px] aspect-square relative z-10 p-2 transition-all duration-700 mt-4 flex items-center justify-center ${powerLevel >= 20000 ? 'border-[3px] border-brand-accent shadow-[0_0_50px_rgba(20,241,149,0.8)] rounded-full' : 'drop-shadow-2xl'}`}>
                         {layeredAvatarUrl ? (
                             <img src={layeredAvatarUrl} alt="AI Avatar" className="w-full h-full object-contain" />
                         ) : (
