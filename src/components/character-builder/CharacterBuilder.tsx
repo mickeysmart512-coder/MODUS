@@ -90,12 +90,14 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
                 body: JSON.stringify({ config: avatarConfig, equippedItems })
             });
             const data = await res.json();
-            if (data.success && data.layeredAvatarUrl) {
+            if (res.ok && data.success && data.layeredAvatarUrl) {
                 setLayeredAvatarUrl(data.layeredAvatarUrl);
+            } else {
+                alert(data.error || "Failed to synthesize the 3D character.");
             }
         } catch (error) {
             console.error("AI Synthesis failed", error);
-            alert("Failed to synthesize the 3D character.");
+            alert("A network error occurred while synthesizing the character.");
         } finally {
             setIsSynthesizing(false);
         }
