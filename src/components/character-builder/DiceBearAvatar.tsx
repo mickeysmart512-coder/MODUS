@@ -34,9 +34,21 @@ export default function DiceBearAvatar({ seed, width = "100%", height = "100%", 
             if (config.eyes) options.eyes = [config.eyes];
             if (config.eyebrows) options.eyebrows = [config.eyebrows];
             if (config.mouth) options.mouth = [config.mouth];
-            if (config.facialHair) options.facialHair = [config.facialHair];
+            if (config.facialHair && config.facialHair !== "none") {
+                options.facialHair = [config.facialHair];
+                options.facialHairProbability = 100;
+            } else {
+                options.facialHairProbability = 0;
+            }
+
             if (config.facialHairColor) options.facialHairColor = config.facialHairColor;
-            if (config.accessories) options.accessories = [config.accessories];
+
+            if (config.accessories && config.accessories !== "none") {
+                options.accessories = [config.accessories];
+                options.accessoriesProbability = 100;
+            } else {
+                options.accessoriesProbability = 0;
+            }
             if (config.accessoriesColor) options.accessoriesColor = config.accessoriesColor;
             options.backgroundColor = ["b6e3f4", "c0aede", "d1d4f9", "ffd5dc", "ffdfbf"];
         } else {
