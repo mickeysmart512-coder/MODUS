@@ -29,7 +29,7 @@ export async function POST(req: Request) {
         // Include a random seed to ensure a fresh generation 
         const seed = Math.floor(Math.random() * 1000000);
         
-        const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&model=flux&seed=${seed}`;
+        const imageUrl = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=1024&nologo=true&model=flux&seed=${seed}`;
 
         // Verify the image generated correctly by making a quick HEAD request if needed, 
         // but we can also just return the URL directly since Pollinations handles generation on the fly
