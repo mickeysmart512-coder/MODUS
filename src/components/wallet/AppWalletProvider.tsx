@@ -62,7 +62,9 @@ export default function AppWalletProvider({
 
         if (error.name === 'WalletConnectionError' && error.message === 'Unexpected error') {
             // "Unexpected error" might happen if wallet popup is blocked, extensions conflict, or the extension needs to be unlocked.
-            alert("Connection error: Please ensure your Phantom/Solflare extension is installed, unlocked, and not blocked by popups. Try refreshing the page.");
+            console.warn("Wallet Connection Warning:", error.message);
+            // We use a more subtle warning or just let the user try again manually if autoConnect fails
+            // alert("Connection error: Please ensure your Phantom/Solflare extension is installed, unlocked, and not blocked by popups. Try refreshing the page.");
         }
     }, []);
 
