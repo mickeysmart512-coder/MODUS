@@ -5,13 +5,6 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { config, equippedItems } = body;
         
-        if (!process.env.OPENAI_API_KEY) {
-            return NextResponse.json({ 
-                success: false, 
-                error: "OPENAI_API_KEY is missing in your .env.local file! Please add it to enable dynamic, real-time 3D synthesis of the exact character." 
-            }, { status: 400 });
-        }
-
         // Parse user traits
         const skinTone = config?.skinColor?.[0] || "medium";
         const clothing = config?.clothing || "casual clothes";
@@ -22,38 +15,28 @@ export async function POST(req: Request) {
         const accessories = config?.accessories !== "none" ? config?.accessories : "no accessories";
 
         // Build a hyper-specific prompt based on the 2D configuration
-        const prompt = `A premium, hyper-realistic, high-quality 3D render of a character for a modern Web3 game, waist up. 
-The character has skin tone hex #${skinTone}. 
-They have ${hair} style hair colored hex #${hairColor}.
-They are ${facialHair}. 
-They are wearing ${clothing} (colored hex #${clothingColor}) and ${accessories}. 
-Cinematic studio lighting, clean solid dark background, 8k resolution, stylized like a premium vinyl toy or Pixar character. exactly matching the provided traits.`;
+        // Optimized for the Flux model which handles aesthetics brilliantly
+        const prompt = `A premium, hyper-realistic, high-quality 3D render of a character for a modern Web3 game, waist up portrait. 
+ The character has skin tone hex #${skinTone}. 
+ They have ${hair} style hair colored hex #${hairColor}.
+ They are ${facialHair}. 
+ They are wearing ${clothing} (colored hex #${clothingColor}) and ${accessories}. 
+ Cinematic studio lighting, clean solid dark background, 8k resolution, highly detailed, stylized like a premium vinyl collectible toy or Pixar character. Masterpiece.`;
 
-        const response = await fetch('https://api.openai.com/v1/images/generations', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-            },
-            body: JSON.stringify({
-                model: "dall-e-3",
-                prompt: prompt,
-                n: 1,
-                size: "1024x1024",
-                response_format: "url"
-            })
-        });
+        // We use Pollinations (with the FLUX model) because it's arguably better than DALL-E 3 for 
+        // 3D character concepts, it's fast, and requires no API key!
+        const encodedPrompt = encodeURIComponent(prompt);
+        // Include a random seed to ensure a fresh generation 
+        const seed = Math.floor(Math.random() * 1000000);
+        
+        const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&model=flux&seed=${seed}`;
 
-        const data = await response.json();
-
-        if (!response.ok) {
-            console.error("OpenAI Error:", data);
-            return NextResponse.json({ success: false, error: data.error?.message || "OpenAI generation failed" }, { status: 500 });
-        }
-
+        // Verify the image generated correctly by making a quick HEAD request if needed, 
+        // but we can also just return the URL directly since Pollinations handles generation on the fly
+        
         return NextResponse.json({
             success: true,
-            layeredAvatarUrl: data.data[0].url
+            layeredAvatarUrl: imageUrl
         });
     } catch (error) {
         console.error("Synthesis error:", error);
