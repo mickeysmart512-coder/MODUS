@@ -9,9 +9,9 @@ import { supabase, Item, SystemSettings } from "@/lib/supabase";
 import { useAuthStore } from "@/store/useAuthStore";
 import DiceBearAvatar from "./DiceBearAvatar";
 import {
-    NeonVisorLayer, CyberHelmLayer,
-    PlasmaCoreLayer, TitaniumShellLayer,
-    VoidBladeLayer
+    NeonShadesLayer, CyberHelmLayer,
+    TechVestLayer, TitaniumShellLayer,
+    ModusDroneLayer
 } from "./layers/EquipmentLayers";
 import { 
     skinColors, hairColors, clothesColors, topOptions, 
@@ -61,9 +61,9 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
     }, []);
 
     const traits = [
-        { id: "head", label: "Headwear", icon: Sparkles },
-        { id: "body", label: "Armor", icon: Shield },
-        { id: "weapon", label: "Weapon", icon: Zap },
+        { id: "head", label: "Headgear", icon: Sparkles },
+        { id: "body", label: "Outerwear", icon: Shield },
+        { id: "weapon", label: "Collectibles", icon: Zap },
     ];
 
     const filteredItems = items.filter(item => {
@@ -71,8 +71,8 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
         // We'll infer type from name or default to 'head' for new items if they contain specific words
         const name = item.name.toLowerCase();
         let type = 'head';
-        if (name.includes('armor') || name.includes('core') || name.includes('shell')) type = 'body';
-        if (name.includes('blade') || name.includes('weapon') || name.includes('gun')) type = 'weapon';
+        if (name.includes('vest') || name.includes('hoodie') || name.includes('jacket') || name.includes('suit') || name.includes('armor') || name.includes('core') || name.includes('shell')) type = 'body';
+        if (name.includes('drone') || name.includes('tablet') || name.includes('blade') || name.includes('weapon') || name.includes('cube')) type = 'weapon';
 
         return type === selectedTrait;
     });
@@ -117,8 +117,8 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
         // INFER TYPE HACK TO MATCH DB
         const name = activeItemData.name.toLowerCase();
         let inferredType = 'head';
-        if (name.includes('armor') || name.includes('core') || name.includes('shell')) inferredType = 'body';
-        if (name.includes('blade') || name.includes('weapon') || name.includes('gun')) inferredType = 'weapon';
+        if (name.includes('vest') || name.includes('hoodie') || name.includes('jacket') || name.includes('suit') || name.includes('armor') || name.includes('core') || name.includes('shell')) inferredType = 'body';
+        if (name.includes('drone') || name.includes('tablet') || name.includes('blade') || name.includes('weapon') || name.includes('cube')) inferredType = 'weapon';
 
         if (isOwned) {
             // Equip instantly
@@ -200,9 +200,9 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
         const matchesType = (item: Item | undefined) => {
             if (!item) return false;
             const nm = item.name.toLowerCase();
-            if (type === 'body') return nm.includes('armor') || nm.includes('core') || nm.includes('shell');
-            if (type === 'weapon') return nm.includes('blade') || nm.includes('weapon') || nm.includes('gun');
-            return !((nm.includes('armor') || nm.includes('core') || nm.includes('shell') || nm.includes('blade') || nm.includes('weapon') || nm.includes('gun')));
+            if (type === 'body') return nm.includes('vest') || nm.includes('hoodie') || nm.includes('jacket') || nm.includes('suit') || nm.includes('armor') || nm.includes('core') || nm.includes('shell');
+            if (type === 'weapon') return nm.includes('drone') || nm.includes('tablet') || nm.includes('blade') || nm.includes('weapon') || nm.includes('cube');
+            return !((nm.includes('vest') || nm.includes('hoodie') || nm.includes('jacket') || nm.includes('suit') || nm.includes('armor') || nm.includes('core') || nm.includes('shell') || nm.includes('drone') || nm.includes('tablet') || nm.includes('blade') || nm.includes('weapon') || nm.includes('cube')));
         };
 
         if (activeItemData && matchesType(activeItemData)) return activeItem;
@@ -216,9 +216,9 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
                 <div className="w-[80%] max-w-[300px] aspect-[2/3] relative z-10 drop-shadow-[0_0_30px_rgba(139,92,246,0.6)]">
                     <DiceBearAvatar seed="preview-hero-seed" />
                     <div className="absolute inset-0 pointer-events-none">
-                        <NeonVisorLayer />
-                        <VoidBladeLayer />
-                        <PlasmaCoreLayer />
+                        <NeonShadesLayer />
+                        <ModusDroneLayer />
+                        <TechVestLayer />
                     </div>
                 </div>
             </div>
@@ -320,7 +320,7 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
                                     <AnimatePresence>
                                         {renderedBodyId === 4 && (
                                             <motion.div key="body-4" initial={{ opacity: 0, scale: 1.1, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ type: "spring", bounce: 0.4 }} className="absolute inset-0">
-                                                <PlasmaCoreLayer />
+                                                <TechVestLayer />
                                             </motion.div>
                                         )}
                                         {renderedBodyId === 5 && (
@@ -330,7 +330,7 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
                                         )}
                                         {renderedHeadId === 1 && (
                                             <motion.div key="head-1" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ type: "spring", bounce: 0.5 }} className="absolute inset-0">
-                                                <NeonVisorLayer />
+                                                <NeonShadesLayer />
                                             </motion.div>
                                         )}
                                         {renderedHeadId === 2 && (
@@ -340,7 +340,7 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
                                         )}
                                         {renderedWeaponId === 6 && (
                                             <motion.div key="weap-6" initial={{ opacity: 0, x: -30, rotate: -20 }} animate={{ opacity: 1, x: 0, rotate: 0 }} exit={{ opacity: 0, x: -30, rotate: -20 }} transition={{ type: "spring", bounce: 0.6 }} className="absolute inset-0 drop-shadow-[0_0_20px_rgba(139,92,246,0.8)]">
-                                                <VoidBladeLayer />
+                                                <ModusDroneLayer />
                                             </motion.div>
                                         )}
                                     </AnimatePresence>
@@ -439,9 +439,9 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
                                 {activeMasterTab === 'forge' && (
                                     <div className="space-y-6">
                                         {renderSubTabs([
-                                            { id: 'head', label: 'Headwear' },
-                                            { id: 'body', label: 'Armor' },
-                                            { id: 'weapon', label: 'Weapon' }
+                                            { id: 'head', label: 'Headgear' },
+                                            { id: 'body', label: 'Outerwear' },
+                                            { id: 'weapon', label: 'Collectibles' }
                                         ])}
                                         
                                         {/* The Existing Forge Item Store! */}
@@ -449,8 +449,8 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
                                             {filteredItems.filter(item => {
                                                 const name = item.name.toLowerCase();
                                                 let type = 'head';
-                                                if (name.includes('armor') || name.includes('core') || name.includes('shell')) type = 'body';
-                                                if (name.includes('blade') || name.includes('weapon') || name.includes('gun')) type = 'weapon';
+                                                if (name.includes('vest') || name.includes('hoodie') || name.includes('jacket') || name.includes('suit') || name.includes('armor') || name.includes('core') || name.includes('shell')) type = 'body';
+                                                if (name.includes('drone') || name.includes('tablet') || name.includes('blade') || name.includes('weapon') || name.includes('cube')) type = 'weapon';
                                                 return type === activeSubTab;
                                             }).length === 0 ? (
                                                 <div className="col-span-2 text-white/50 text-center py-12">No items found for this slot.</div>
@@ -458,8 +458,8 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
                                                 filteredItems.filter(item => {
                                                     const name = item.name.toLowerCase();
                                                     let type = 'head';
-                                                    if (name.includes('armor') || name.includes('core') || name.includes('shell')) type = 'body';
-                                                    if (name.includes('blade') || name.includes('weapon') || name.includes('gun')) type = 'weapon';
+                                                    if (name.includes('vest') || name.includes('hoodie') || name.includes('jacket') || name.includes('suit') || name.includes('armor') || name.includes('core') || name.includes('shell')) type = 'body';
+                                                    if (name.includes('drone') || name.includes('tablet') || name.includes('blade') || name.includes('weapon') || name.includes('cube')) type = 'weapon';
                                                     return type === activeSubTab;
                                                 }).map((item, i) => {
                                                     const itemIsOwned = inventory.includes(item.id);
@@ -504,16 +504,16 @@ export default function CharacterBuilder({ previewOnly = false }: CharacterBuild
                                                             {!activeItemData || (activeItemData && filteredItems.filter(item => {
                                                                 const name = item.name.toLowerCase();
                                                                 let type = 'head';
-                                                                if (name.includes('armor') || name.includes('core') || name.includes('shell')) type = 'body';
-                                                                if (name.includes('blade') || name.includes('weapon') || name.includes('gun')) type = 'weapon';
+                                                                if (name.includes('vest') || name.includes('hoodie') || name.includes('jacket') || name.includes('suit') || name.includes('armor') || name.includes('core') || name.includes('shell')) type = 'body';
+                                                            if (name.includes('drone') || name.includes('tablet') || name.includes('blade') || name.includes('weapon') || name.includes('cube')) type = 'weapon';
                                                                 return type === activeSubTab;
                                                             }).findIndex(i => i.id === activeItemData.id) === -1) ? "Select an item above" : Object.values(equippedItems).includes(activeItemData?.id as number) ? "Already Equipped" : isOwned ? `Equip ${activeItemData.name}` : `Buy for ${activeItemData?.price} ${activeItemData?.currency_type.toUpperCase()}`}
                                                         </span>
                                                         {!isOwned && activeItemData && (activeItemData && filteredItems.filter(item => {
                                                             const name = item.name.toLowerCase();
                                                             let type = 'head';
-                                                            if (name.includes('armor') || name.includes('core') || name.includes('shell')) type = 'body';
-                                                            if (name.includes('blade') || name.includes('weapon') || name.includes('gun')) type = 'weapon';
+                                                            if (name.includes('vest') || name.includes('hoodie') || name.includes('jacket') || name.includes('suit') || name.includes('armor') || name.includes('core') || name.includes('shell')) type = 'body';
+                                                            if (name.includes('drone') || name.includes('tablet') || name.includes('blade') || name.includes('weapon') || name.includes('cube')) type = 'weapon';
                                                             return type === activeSubTab;
                                                         }).findIndex(i => i.id === activeItemData.id) !== -1) && <ShoppingCart className="w-5 h-5 ml-2" />}
                                                     </>

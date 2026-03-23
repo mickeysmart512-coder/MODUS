@@ -4,11 +4,11 @@ import { supabase } from '@/lib/supabase';
 export async function GET() {
     try {
         const newItems = [
-            { name: "Aero Visor", description: "Aerodynamic headgear", price: 300, currency_type: 'credits', image_url: "", power_bonus: 15 },
-            { name: "Obsidian Core", description: "Dark energy armor", price: 1200, currency_type: 'credits', image_url: "", power_bonus: 60 },
-            { name: "Plasma Cannon", description: "Heavy artillery", price: 2500, currency_type: 'crypto', image_url: "", power_bonus: 100 },
-            { name: "Stealth Suit", description: "Invisible armor coating", price: 800, currency_type: 'credits', image_url: "", power_bonus: 40 },
-            { name: "Quantum Blade", description: "Slices through reality", price: 1500, currency_type: 'credits', image_url: "", power_bonus: 85 }
+            { name: "Neon Shades", description: "Sleek glowing eyewear for the metaverse", price: 300, currency_type: 'credits', image_url: "", power_bonus: 15 },
+            { name: "Tech Vest", description: "Modular tactical outerwear with LEDs", price: 1200, currency_type: 'credits', image_url: "", power_bonus: 60 },
+            { name: "Modus Drone", description: "Companion bot for the data-sphere", price: 2500, currency_type: 'crypto', image_url: "", power_bonus: 100 },
+            { name: "Shadow Hoodie", description: "Stealth-ready premium apparel", price: 800, currency_type: 'credits', image_url: "", power_bonus: 40 },
+            { name: "Data Tablet", description: "Holographic interface for power users", price: 1500, currency_type: 'credits', image_url: "", power_bonus: 85 }
         ];
 
         // Insert new items into Supabase

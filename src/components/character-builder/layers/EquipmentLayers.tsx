@@ -29,8 +29,8 @@ const EquipmentDefs = () => (
 
 // ==== HEADWEAR (IDs 1, 2, 3) ==== //
 
-// 1. Neon Visor: wrap around the head area (y=80-90, x=150-250)
-export const NeonVisorLayer = () => (
+// 1. Neon Shades: Sleek glowing eyewear
+export const NeonShadesLayer = () => (
     <svg viewBox="0 0 400 600" className="w-full h-full absolute inset-0 z-30 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
         <EquipmentDefs />
         <g filter="url(#neonShadow)">
@@ -63,8 +63,8 @@ export const CyberHelmLayer = () => (
 
 // ==== ARMOR (IDs 4, 5) ==== //
 
-// 4. Plasma Core: Center of chest (x=200, y=220)
-export const PlasmaCoreLayer = () => (
+// 4. Tech Vest: Modular tactical outerwear
+export const TechVestLayer = () => (
     <svg viewBox="0 0 400 600" className="w-full h-full absolute inset-0 z-20 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
         <EquipmentDefs />
         {/* Chest Plate holding the core */}
@@ -103,8 +103,8 @@ export const TitaniumShellLayer = () => (
 
 // ==== WEAPONS (ID 6) ==== //
 
-// 6. Void Blade: Floating or held in the right hand (x=260, y=280)
-export const VoidBladeLayer = () => (
+// 6. Modus Drone: Floating companion bot
+export const ModusDroneLayer = () => (
     <svg viewBox="0 0 400 600" className="w-full h-full absolute inset-0 z-50 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
         <EquipmentDefs />
         <g style={{ transformOrigin: '280px 320px', animation: 'float-weapon 4s ease-in-out infinite' }}>
