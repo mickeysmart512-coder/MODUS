@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { createAvatar } from "@dicebear/core";
-import { openPeeps } from "@dicebear/collection";
+import { avataaars } from "@dicebear/collection";
 import { motion } from "framer-motion";
 
 interface DiceBearAvatarProps {
@@ -26,21 +26,24 @@ export default function DiceBearAvatar({ seed, width = "100%", height = "100%", 
         const options: Record<string, any> = { seed };
 
         if (config) {
-            // Map the old avataaar colors to open-peeps body
             if (config.skinColor) options.skinColor = config.skinColor;
-            if (config.clothesColor) options.clothingColor = config.clothesColor;
+            if (config.top) options.top = [config.top];
             if (config.hairColor) options.hairColor = config.hairColor;
-            
-            // Map shape properties if they perfectly overlap (most don't, so open-peeps will gracefully ignore invalid shapes and use default or seed-based)
-            if (config.top) options.head = [config.top];
-            if (config.clothing) options.body = [config.clothing];
-            if (config.mouth) options.face = [config.mouth];
-            if (config.accessories && config.accessories !== 'none') options.accessory = [config.accessories];
-            
+            if (config.clothing) options.clothing = [config.clothing];
+            if (config.clothesColor) options.clothesColor = config.clothesColor;
+            if (config.eyes) options.eyes = [config.eyes];
+            if (config.eyebrows) options.eyebrows = [config.eyebrows];
+            if (config.mouth) options.mouth = [config.mouth];
+            if (config.facialHair) options.facialHair = [config.facialHair];
+            if (config.facialHairColor) options.facialHairColor = config.facialHairColor;
+            if (config.accessories) options.accessories = [config.accessories];
+            if (config.accessoriesColor) options.accessoriesColor = config.accessoriesColor;
             options.backgroundColor = ["b6e3f4", "c0aede", "d1d4f9", "ffd5dc", "ffdfbf"];
         } else {
             // Default look if no config yet
             options.skinColor = ["edb98a"];
+            options.top = ["shortFlat"];
+            options.clothing = ["hoodie"];
             options.backgroundColor = ["b6e3f4", "c0aede", "d1d4f9", "ffd5dc", "ffdfbf"];
         }
 
@@ -51,11 +54,11 @@ export default function DiceBearAvatar({ seed, width = "100%", height = "100%", 
             options.clothesColor = ["a5b1c2"];
         }
         if (equippedItems?.body === 4) {
-            options.body = ["blazerAndShirt", "tShirt"];
-            options.clothingColor = ["262e33"];
+            options.clothing = ["blazerAndShirt"];
+            options.clothesColor = ["262e33"];
         }
 
-        const avatar = createAvatar(openPeeps, options as any);
+        const avatar = createAvatar(avataaars, options as any);
         return avatar.toString();
     }, [seed, config, equippedItems]);
 
