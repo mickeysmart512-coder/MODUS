@@ -3,9 +3,21 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Sparkles, Zap, Shield } from "lucide-react";
 import Link from "next/link";
-import CharacterBuilder from "@/components/character-builder/CharacterBuilder";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function Home() {
+  const router = useRouter();
+  const { isXConnected, setSocialModalOpen } = useAuthStore();
+
+  const handleStartBuilding = () => {
+    if (isXConnected) {
+      router.push("/character-builder");
+    } else {
+      setSocialModalOpen(true);
+    }
+  };
   return (
     <div className="relative min-h-screen font-sans overflow-hidden">
       {/* Dynamic Background Elements */}
@@ -50,12 +62,12 @@ export default function Home() {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full sm:w-auto">
-              <Link href="/dashboard" className="glass-button bg-brand-primary/20 hover:bg-brand-primary/30 border-brand-primary/50 text-white px-8 py-4 flex items-center justify-center space-x-2 group no-underline">
-                <span className="font-semibold text-lg">Enter App</span>
+              <button 
+                onClick={handleStartBuilding}
+                className="glass-button bg-brand-primary/20 hover:bg-brand-primary/30 border-brand-primary/50 text-white px-8 py-4 flex items-center justify-center space-x-2 group no-underline w-full sm:w-auto"
+              >
+                <span className="font-semibold text-lg">Start building your character</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <button className="glass-button px-8 py-4 flex items-center justify-center space-x-2 text-foreground/80 hover:text-white">
-                <span className="font-semibold text-lg">Read Docs</span>
               </button>
             </div>
           </motion.div>
@@ -83,9 +95,16 @@ export default function Home() {
                 }}
                 className="w-full h-full relative z-10 flex items-center justify-center pt-4"
               >
-                <AnimatePresence mode="wait">
-                  <CharacterBuilder previewOnly />
-                </AnimatePresence>
+                <div className="relative w-full h-full flex items-center justify-center pointer-events-none drop-shadow-2xl">
+                  <Image 
+                    src="/hero_cartoon_character.png" 
+                    alt="Hero Character" 
+                    width={400} 
+                    height={400} 
+                    className="object-contain w-full h-full max-w-[90%] max-h-[90%]"
+                    priority
+                  />
+                </div>
               </motion.div>
             </div>
           </motion.div>

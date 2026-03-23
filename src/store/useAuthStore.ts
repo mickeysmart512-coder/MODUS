@@ -9,6 +9,7 @@ interface AuthState {
     // Social Onboarding Mock States
     isXConnected: boolean;
     hasFollowedProject: boolean;
+    isSocialModalOpen: boolean;
 
     // Admin Auth State
     isAdmin: boolean;
@@ -41,6 +42,7 @@ interface AuthState {
     setUsername: (name: string) => void;
     setXConnected: (status: boolean) => void;
     setHasFollowedProject: (status: boolean) => void;
+    setSocialModalOpen: (status: boolean) => void;
     setIsAdmin: (status: boolean) => void;
     addToInventory: (itemIds: number[], powerAdded?: number) => Promise<void>;
     spendCredits: (amount: number, description: string) => Promise<boolean>;
@@ -55,6 +57,7 @@ export const useAuthStore = create<AuthState>()(
             username: null,
             isXConnected: false,
             hasFollowedProject: false,
+            isSocialModalOpen: false,
             isAdmin: false,
             // Give them some default owned items for testing
             inventory: [],
@@ -162,6 +165,7 @@ export const useAuthStore = create<AuthState>()(
             setUsername: (name) => set({ username: name }),
             setXConnected: (status) => set({ isXConnected: status }),
             setHasFollowedProject: (status) => set({ hasFollowedProject: status }),
+            setSocialModalOpen: (status) => set({ isSocialModalOpen: status }),
             setIsAdmin: (status) => set({ isAdmin: status }),
 
             addToInventory: async (itemIds, powerAdded = 0) => {

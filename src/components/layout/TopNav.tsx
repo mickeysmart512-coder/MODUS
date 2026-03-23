@@ -19,8 +19,7 @@ const WalletMultiButton = dynamic(
 
 export default function TopNav() {
     const pathname = usePathname();
-    const { isXConnected, hasFollowedProject, setXConnected, setUsername, username, powerLevel } = useAuthStore();
-    const [isSocialModalOpen, setIsSocialModalOpen] = useState(false);
+    const { isXConnected, hasFollowedProject, setXConnected, setUsername, username, powerLevel, isSocialModalOpen, setSocialModalOpen } = useAuthStore();
 
     useEffect(() => {
         const checkSession = async () => {
@@ -110,7 +109,7 @@ export default function TopNav() {
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.9 }}
-                                    onClick={() => setIsSocialModalOpen(true)}
+                                    onClick={() => setSocialModalOpen(true)}
                                     className="bg-brand-primary hover:bg-brand-primary/90 text-white px-5 py-2 rounded-full font-medium transition-colors shadow-[0_0_15px_rgba(139,92,246,0.5)] font-heading text-sm"
                                 >
                                     Login with X
@@ -168,7 +167,7 @@ export default function TopNav() {
 
             <SocialOnboardingModal
                 isOpen={isSocialModalOpen}
-                onClose={() => setIsSocialModalOpen(false)}
+                onClose={() => setSocialModalOpen(false)}
             />
         </>
     );
