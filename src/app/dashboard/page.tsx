@@ -404,7 +404,7 @@ function MobileBottomNav() {
                         "p-1.5 rounded-full transition-colors",
                         tab.active ? "text-[#ff00aa] bg-[#ff00aa]/10" : "text-white/40 hover:text-white/80"
                     )}>
-                        {React.cloneElement(tab.icon as React.ReactElement, { className: "w-5 h-5" })}
+                        {React.cloneElement(tab.icon as any, { className: "w-5 h-5" })}
                     </div>
                     {tab.active && <div className="w-1 h-1 rounded-full bg-[#ff00aa] shadow-[0_0_5px_#ff00aa]" />}
                 </div>
