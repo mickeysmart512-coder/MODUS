@@ -129,7 +129,7 @@ export default function TopNav() {
                         </AnimatePresence>
 
                         {/* Wallet Button - Always visible, conditionally disabled */}
-                        <div className={`transition-all duration-300 ${!isSocialOnboardingComplete ? "opacity-40 grayscale blur-[0.5px] pointer-events-none" : ""}`}>
+                        <div className="transition-all duration-300">
                             <WalletMultiButton style={{
                                 backgroundColor: 'var(--color-brand-primary)',
                                 borderRadius: '9999px',
