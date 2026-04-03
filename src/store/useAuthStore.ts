@@ -20,6 +20,7 @@ interface AuthState {
     modTokens: number;
     powerLevel: number;
     accountLevel: number;
+    fragmentsSecured: string[];
 
     // Avatar Configuration State
     avatarConfig: {
@@ -46,6 +47,7 @@ interface AuthState {
     setIsAdmin: (status: boolean) => void;
     addToInventory: (itemIds: number[], powerAdded?: number) => Promise<void>;
     spendCredits: (amount: number, description: string) => Promise<boolean>;
+    addSecuredFragment: (fragmentName: string) => Promise<void>;
     disconnect: () => void;
     fetchUserData: (walletAddress: string) => Promise<void>;
 }
@@ -65,6 +67,7 @@ export const useAuthStore = create<AuthState>()(
             modTokens: 0,
             powerLevel: 0,
             accountLevel: 1,
+            fragmentsSecured: [],
 
             avatarConfig: {
                 skinColor: ["edb98a"],
@@ -81,8 +84,8 @@ export const useAuthStore = create<AuthState>()(
                 accessoriesColor: ["262e33"]
             },
 
-            setAvatarConfig: (newConfig) => set((state) => ({ 
-                avatarConfig: { ...state.avatarConfig, ...newConfig } 
+            setAvatarConfig: (newConfig) => set((state) => ({
+                avatarConfig: { ...state.avatarConfig, ...newConfig }
             })),
 
             setWallet: async (address) => {
@@ -90,7 +93,7 @@ export const useAuthStore = create<AuthState>()(
                 if (address) {
                     await get().fetchUserData(address);
                 } else {
-                    set({ inventory: [], credits: 0, modTokens: 0, powerLevel: 0, accountLevel: 1, username: null });
+                    set({ inventory: [], credits: 0, modTokens: 0, powerLevel: 0, accountLevel: 1, username: null, fragmentsSecured: [] });
                 }
             },
 
@@ -122,7 +125,8 @@ export const useAuthStore = create<AuthState>()(
                                     credits: 1500, // Starting bonus
                                     mod_tokens: 0,
                                     power_level: 0,
-                                    account_level: 1
+                                    account_level: 1,
+                                    fragments_secured: []
                                 }
                             ])
                             .select()
@@ -144,7 +148,8 @@ export const useAuthStore = create<AuthState>()(
                             credits: user.credits,
                             modTokens: user.mod_tokens,
                             powerLevel: user.power_level,
-                            accountLevel: user.account_level
+                            accountLevel: user.account_level,
+                            fragmentsSecured: user.fragments_secured || []
                         });
 
                         // Fetch inventory
@@ -235,6 +240,22 @@ export const useAuthStore = create<AuthState>()(
                 }
             },
 
+            addSecuredFragment: async (fragmentName: string) => {
+                const state = get();
+                if (!state.walletAddress) return;
+
+                const newFragments = [...state.fragmentsSecured, fragmentName];
+                set({ fragmentsSecured: newFragments }); // Optimistic
+
+                try {
+                    await supabase.from('users').update({
+                        fragments_secured: newFragments
+                    }).eq('wallet_address', state.walletAddress);
+                } catch (e) {
+                    console.error("Failed to secure fragment", e);
+                }
+            },
+
             disconnect: () => set({
                 walletAddress: null,
                 username: null,
@@ -245,7 +266,8 @@ export const useAuthStore = create<AuthState>()(
                 credits: 0,
                 modTokens: 0,
                 powerLevel: 0,
-                accountLevel: 1
+                accountLevel: 1,
+                fragmentsSecured: []
             }),
         }),
         {

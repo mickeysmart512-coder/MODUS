@@ -17,6 +17,7 @@ export type User = {
     mod_tokens: number;
     power_level: number;
     account_level: number;
+    fragments_secured: string[];
     created_at: string;
 };
 
@@ -63,3 +64,14 @@ export type SystemSettings = {
     season_countdown_end: string | null;
     updated_at: string;
 }
+
+export type DailyMission = {
+    id: string; // UUID
+    active_date: string; // YYYY-MM-DD
+    title: string;
+    fragment_name: string;
+    briefing_dialogue: string[];
+    success_dialogue: string[];
+    failure_dialogue: string[];
+    created_at: string;
+};
