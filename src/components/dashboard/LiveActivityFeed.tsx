@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpDown, Zap, RefreshCw } from "lucide-react";
+import { ArrowUpDown, Zap, RefreshCw, Activity } from "lucide-react";
 
 interface ActivityItem {
     id: string;
