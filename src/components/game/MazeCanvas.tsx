@@ -35,7 +35,7 @@ export function MazeCanvas({ onCheckpointReached, onCaught }: MazeCanvasProps) {
 
     // Logic Refs
     const pState = useRef({
-        x: 40, y: 40, size: 20, speed: 3.5,
+        x: 40, y: 40, size: 20, speed: 3.5, lastRot: 0,
         keys: { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, w: false, a: false, s: false, d: false }
     });
 
@@ -289,9 +289,9 @@ export function MazeCanvas({ onCheckpointReached, onCaught }: MazeCanvasProps) {
 
             // Calculate rotation based on movement vector
             if (dx !== 0 || dy !== 0) {
-                pState.current.keys['lastRot'] = Math.atan2(dy, dx) as any;
+                pState.current.lastRot = Math.atan2(dy, dx);
             }
-            ctx.rotate((pState.current.keys['lastRot'] as any) || 0);
+            ctx.rotate(pState.current.lastRot || 0);
 
             // Draw Shoulders
             ctx.fillStyle = clotheCol;
