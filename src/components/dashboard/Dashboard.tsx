@@ -6,10 +6,20 @@ import { Activity, Coins, Users, ArrowUpRight, Zap, Loader2, Bell, Lock, Calenda
 import { useWallet } from "@solana/wallet-adapter-react";
 import { supabase, User, Activity as SupabaseActivity, Announcement, SystemSettings } from "@/lib/supabase";
 import { formatDistanceToNow } from 'date-fns';
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function Dashboard() {
     const { publicKey } = useWallet();
-    const [profile, setProfile] = useState<User | null>(null);
+    const { username, credits, modTokens, powerLevel, accountLevel } = useAuthStore();
+
+    const profile = username ? {
+        username,
+        credits: credits || 0,
+        mod_tokens: modTokens || 0,
+        power_level: powerLevel || 0,
+        account_level: accountLevel || 1,
+    } : null;
+
     const [isLoading, setIsLoading] = useState(true);
 
     const [activities, setActivities] = useState<SupabaseActivity[]>([]);
@@ -30,19 +40,9 @@ export default function Dashboard() {
                 if (activeAnnouncements) setAnnouncements(activeAnnouncements);
 
                 if (!publicKey) {
-                    setProfile(null);
                     setActivities([]);
                     return;
                 }
-
-                // Fetch User Data
-                const { data: userData } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('wallet_address', publicKey.toString())
-                    .single();
-
-                if (userData) setProfile(userData);
 
                 // Fetch Activities
                 setIsLoadingActivities(true);
