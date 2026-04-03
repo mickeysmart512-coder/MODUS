@@ -22,13 +22,13 @@ function WalletConnectionSync() {
     const { setWallet, isXConnected, hasFollowedProject } = useAuthStore();
 
     useEffect(() => {
-        // Only connect if social onboarding is complete
-        if (connected && publicKey && isXConnected && hasFollowedProject) {
+        // Automatically sync connected state
+        if (connected && publicKey) {
             setWallet(publicKey.toString());
         } else if (!connected) {
             setWallet(null);
         }
-    }, [connected, publicKey, setWallet, isXConnected, hasFollowedProject]);
+    }, [connected, publicKey, setWallet]);
 
     return null;
 }
