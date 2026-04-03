@@ -48,10 +48,7 @@ export default function TopNav() {
         return () => subscription.unsubscribe();
     }, [setXConnected, setUsername]);
 
-    // Exclude TopNav completely from any admin-related routes.
-    if (pathname?.startsWith("/admin")) {
-        return null;
-    }
+    // Removed TopNav exclusion so the Wallet Button remains accessible
 
     const isSocialOnboardingComplete = isXConnected && hasFollowedProject;
 
