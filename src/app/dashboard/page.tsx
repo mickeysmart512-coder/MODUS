@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Wallet, Copy, LogOut, Menu, X, Zap, Trophy, Users, CheckCircle,
-    Flame, Gift, User, Home, Crosshair, Sparkles
+    Flame, Gift, User, Home, Crosshair, Sparkles, Gamepad2
 } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
