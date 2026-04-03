@@ -21,7 +21,7 @@ export default function AdminPage() {
     useEffect(() => {
         const checkAuth = async () => {
             if (!walletAddress) {
-                setIsAuthorized(false);
+                // Wait for wallet to connect/hydrate
                 return;
             }
             const { data } = await supabase.from('system_settings').select('admin_wallet_address').eq('id', 1).single();
@@ -75,7 +75,9 @@ export default function AdminPage() {
         }
     };
 
-    if (isAuthorized === null) return <div className="min-h-screen pt-32 text-center text-white">Verifying credentials...</div>;
+    if (!walletAddress) return <div className="min-h-screen pt-32 text-center text-white font-mono">Awaiting wallet connection... Please connect your wallet in the top navigation.</div>;
+
+    if (isAuthorized === null) return <div className="min-h-screen pt-32 text-center text-white">Verifying credentials against Supabase...</div>;
 
     if (isAuthorized === false) {
         return (
