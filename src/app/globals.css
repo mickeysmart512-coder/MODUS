@@ -7,12 +7,12 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  /* Brand Colors */
-  --color-brand-primary: #8b5cf6;
-  --color-brand-secondary: #d946ef;
-  --color-brand-accent: #f43f5e;
-  --color-brand-background: #0f172a;
-  --color-brand-surface: rgba(30, 41, 59, 0.7);
+  /* Brand Colors - Nocturnal Architect */
+  --color-brand-primary: #C49B61;
+  --color-brand-secondary: #F5E6D3;
+  --color-brand-accent: #A67C00;
+  --color-brand-background: #140D0A;
+  --color-brand-surface: rgba(44, 30, 22, 0.85);
 
   /* Custom Animations */
   --animate-float: float 6s ease-in-out infinite;
@@ -34,8 +34,8 @@
 /* Base layer overrides */
 @layer base {
   :root {
-    --background: #0f172a;
-    --foreground: #f8fafc;
+    --background: #0D0806;
+    --foreground: #F5E6D3;
   }
 
   body {
