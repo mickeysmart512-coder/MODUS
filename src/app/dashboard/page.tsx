@@ -1,4 +1,4 @@
-// . trigger rebuild
+"use client";
 import Dashboard from "@/components/dashboard/Dashboard";
 import { SentinelTerminal } from "@/components/game/SentinelTerminal";
 import { MazeCanvas } from "@/components/game/MazeCanvas";
