@@ -7,12 +7,12 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  /* Brand Colors (Luxury Theme) */
-  --color-brand-primary: #C49B61; /* Burnished Gold */
-  --color-brand-secondary: #F5E6D3; /* Cream */
-  --color-brand-accent: #14F195; /* Solana Green */
-  --color-brand-background: #1A110D; /* Deep Chocolate */
-  --color-brand-surface: rgba(44, 27, 24, 0.7); /* Translucent Chocolate */
+  /* Brand Colors (Vibrant Purple Theme) */
+  --color-brand-primary: #8b5cf6;
+  --color-brand-secondary: #d946ef;
+  --color-brand-accent: #f43f5e;
+  --color-brand-background: #0f172a;
+  --color-brand-surface: rgba(30, 41, 59, 0.7);
 
   /* Custom Animations */
   --animate-float: float 6s ease-in-out infinite;
@@ -34,8 +34,8 @@
 /* Base layer overrides */
 @layer base {
   :root {
-    --background: #1A110D;
-    --foreground: #F5E6D3;
+    --background: #0f172a;
+    --foreground: #f8fafc;
   }
 
   body {
