@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { supabase, DailyMission, SystemSettings } from "@/lib/supabase";
-import { ShieldAlert, Plus, Save, Trash2, Calendar, Database } from "lucide-react";
+import { ShieldAlert, Plus, Save, Trash2, Calendar } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function AdminPage() {
@@ -66,8 +66,18 @@ export default function AdminPage() {
         }
     };
 
-    const handleSeedCampaign = async () => {
-        if (!confirm("This will inject the 5 official campaign days starting from today. Continue?")) return;
+    const handleDelete = async (id: string) => {
+        if (!confirm("Are you sure?")) return;
+        const { error } = await supabase.from('daily_missions').delete().eq('id', id);
+        if (!error) {
+            toast.success("Mission Deleted");
+            fetchMissions();
+        }
+    };
+
+    const seedCampaign = async () => {
+        const confirmSeed = confirm("This will inject 5 official campaign days starting from today. Existing missions on these dates might be duplicated. Proceed?");
+        if (!confirmSeed) return;
 
         const campaign = [
             {
@@ -128,32 +138,21 @@ export default function AdminPage() {
             }
         ];
 
-        try {
-            const today = new Date();
-            const inserts = campaign.map((m, i) => {
-                const date = new Date();
-                date.setDate(today.getDate() + i);
-                return {
-                    ...m,
-                    active_date: date.toISOString().split('T')[0]
-                };
-            });
+        const today = new Date();
+        const missionsWithDates = campaign.map((m, i) => {
+            const date = new Date(today);
+            date.setDate(today.getDate() + i);
+            return {
+                ...m,
+                active_date: date.toISOString().split('T')[0]
+            };
+        });
 
-            const { error } = await supabase.from('daily_missions').insert(inserts);
-            if (error) throw error;
-
-            toast.success("5-Day Campaign Injected!");
-            fetchMissions();
-        } catch (e: any) {
-            toast.error(e.message);
-        }
-    };
-
-    const handleDelete = async (id: string) => {
-        if (!confirm("Are you sure?")) return;
-        const { error } = await supabase.from('daily_missions').delete().eq('id', id);
-        if (!error) {
-            toast.success("Mission Deleted");
+        const { error } = await supabase.from('daily_missions').insert(missionsWithDates);
+        if (error) {
+            toast.error(error.message);
+        } else {
+            toast.success("5-Day Campaign Injected Successfully!");
             fetchMissions();
         }
     };
@@ -174,20 +173,33 @@ export default function AdminPage() {
 
     return (
         <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-12">
-            <div>
-                <h1 className="text-4xl font-bold font-heading text-white mb-2">Director's Terminal</h1>
-                <p className="text-foreground/60 text-lg">Schedule the daily Chronos Breach campaigns via Supabase injection.</p>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h1 className="text-4xl font-bold font-heading text-white mb-2 tracking-tight">Director's Terminal</h1>
+                    <p className="text-foreground/60 text-lg">Schedule and override the Paradox campaign protocols.</p>
+                </div>
+                <button 
+                   onClick={seedCampaign}
+                   className="px-6 py-3 bg-brand-secondary/10 border border-brand-secondary/30 text-brand-secondary rounded-full font-bold text-sm hover:bg-brand-secondary/20 transition-all shadow-[0_0_20px_rgba(20,241,149,0.1)] flex items-center space-x-2"
+                >
+                    <Plus className="w-4 h-4" />
+                    <span>Seed Official Script</span>
+                </button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Form Editor */}
-                <div className="glass-panel p-6 sm:p-8 space-y-6 bg-brand-background shadow-2xl">
-                    <h2 className="text-xl font-bold text-white flex items-center mb-6 border-b border-brand-primary/20 pb-4">
+                <div className="glass-panel p-6 sm:p-8 space-y-6 bg-[#0a0604] shadow-2xl border-white/5 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-10">
+                         <Plus className="w-24 h-24 text-brand-primary" />
+                    </div>
+                    
+                    <h2 className="text-xl font-bold text-white flex items-center mb-6 border-b border-brand-primary/20 pb-4 relative z-10">
                         <Plus className="w-5 h-5 text-brand-primary mr-2" />
                         Draft New Mission
                     </h2>
 
-                    <div className="space-y-4">
+                    <div className="space-y-4 relative z-10">
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-xs uppercase tracking-wider text-brand-primary/80 font-bold mb-2">Active Date</label>
@@ -209,57 +221,50 @@ export default function AdminPage() {
                             <textarea rows={4} value={briefing} onChange={e => setBriefing(e.target.value)} placeholder="Sentinel, we have a breach... \n Secure the core." className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white outline-none focus:border-brand-primary transition-colors resize-none" />
                         </div>
 
-                        <div>
-                            <label className="block text-[10px] uppercase tracking-wider text-green-400/80 font-bold mb-2">Success Dialogue</label>
-                            <textarea rows={2} value={success} onChange={e => setSuccess(e.target.value)} placeholder="Excellent work. Fragment secured." className="w-full bg-green-500/5 border border-green-500/20 rounded-lg px-4 py-2 text-green-100 outline-none focus:border-green-500 transition-colors resize-none" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-[10px] uppercase tracking-wider text-green-400/80 font-bold mb-2">Success Dialogue</label>
+                                <textarea rows={2} value={success} onChange={e => setSuccess(e.target.value)} placeholder="Excellent work. Fragment secured." className="w-full bg-green-500/5 border border-green-500/20 rounded-lg px-4 py-2 text-green-100 outline-none focus:border-green-500 transition-colors resize-none text-xs" />
+                            </div>
+
+                            <div>
+                                <label className="block text-[10px] uppercase tracking-wider text-red-400/80 font-bold mb-2">Failure Dialogue</label>
+                                <textarea rows={2} value={failure} onChange={e => setFailure(e.target.value)} placeholder="You were too slow. Try again." className="w-full bg-red-500/5 border border-red-500/20 rounded-lg px-4 py-2 text-red-100 outline-none focus:border-red-500 transition-colors resize-none text-xs" />
+                            </div>
                         </div>
 
-                        <div>
-                            <label className="block text-[10px] uppercase tracking-wider text-red-400/80 font-bold mb-2">Failure Dialogue</label>
-                            <textarea rows={2} value={failure} onChange={e => setFailure(e.target.value)} placeholder="You were too slow. Try again." className="w-full bg-red-500/5 border border-red-500/20 rounded-lg px-4 py-2 text-red-100 outline-none focus:border-red-500 transition-colors resize-none" />
-                        </div>
-
-                        <button onClick={handleCreate} className="w-full mt-4 glass-button bg-brand-primary text-white border-brand-primary/50 hover:bg-brand-primary/90 font-bold py-3 uppercase tracking-wider flex items-center justify-center space-x-2 shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.6)] transition-all">
+                        <button onClick={handleCreate} className="w-full mt-4 glass-button bg-brand-primary text-black border-brand-primary font-black py-4 uppercase tracking-tighter flex items-center justify-center space-x-2 shadow-[0_10px_30px_rgba(196,155,97,0.3)] hover:shadow-[0_15px_40px_rgba(196,155,97,0.5)] transition-all">
                             <Save className="w-5 h-5" />
-                            <span>Schedule Mission</span>
+                            <span>Schedule Mission Protocol</span>
                         </button>
                     </div>
                 </div>
 
                 {/* Display Scheduled Missions */}
                 <div className="space-y-6">
-                    <h2 className="text-xl font-bold text-white flex items-center mb-6 pl-2 justify-between">
-                        <div className="flex items-center">
-                           <Calendar className="w-5 h-5 text-brand-secondary mr-2" />
-                           Scheduled Protocol Breaches
-                        </div>
-                        <button 
-                            onClick={handleSeedCampaign}
-                            className="text-[10px] bg-brand-primary/10 hover:bg-brand-primary/20 text-brand-primary border border-brand-primary/30 px-3 py-1 rounded-full uppercase tracking-widest font-bold flex items-center transition-all"
-                        >
-                            <Database className="w-3 h-3 mr-1" />
-                            Seed Official Script
-                        </button>
+                    <h2 className="text-xl font-bold text-white flex items-center mb-6 pl-2 tracking-widest uppercase">
+                        <Calendar className="w-5 h-5 text-brand-secondary mr-2" />
+                        Active Directives
                     </h2>
 
                     <div className="space-y-4 max-h-[700px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/10">
-                        {missions.length === 0 ? <p className="text-foreground/50 italic px-2">No missions scheduled. The timeline is dark.</p> : null}
+                        {missions.length === 0 ? <p className="text-foreground/50 italic px-2">No missions scheduled. Project Chronos is offline.</p> : null}
 
                         {missions.map(m => (
-                            <div key={m.id} className="glass-panel p-5 relative group border-l-4 border-l-brand-primary/50 bg-[#1A110D]">
+                            <div key={m.id} className="glass-panel p-5 relative group border shadow-xl bg-black/40 border-white/5 transition-all hover:bg-white/5">
                                 <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <button onClick={() => handleDelete(m.id)} className="text-red-400 hover:text-red-300 p-2 hover:bg-red-400/10 rounded-full transition-colors">
                                         <Trash2 className="w-4 h-4" />
                                     </button>
                                 </div>
                                 <div className="flex flex-col space-y-2">
-                                    <span className="text-sm font-mono text-brand-secondary">{new Date(m.active_date).toDateString()}</span>
-                                    <h3 className="text-xl font-bold font-heading text-white">{m.title}</h3>
-                                    <div className="flex items-center space-x-2">
-                                        <span className="px-2 py-0.5 bg-brand-primary/10 text-brand-primary text-xs border border-brand-primary/30 rounded-full font-medium">
+                                    <span className="text-[10px] font-mono text-brand-secondary font-bold tracking-[0.3em]">{new Date(m.active_date).toDateString().toUpperCase()}</span>
+                                    <h3 className="text-xl font-bold font-heading text-white tracking-widest">{m.title}</h3>
+                                    <div className="flex items-center space-x-2 pt-2">
+                                        <span className="px-3 py-1 bg-brand-primary/10 text-brand-primary text-[10px] border border-brand-primary/30 rounded-full font-black uppercase tracking-widest">
                                             {m.fragment_name}
                                         </span>
-                                        <span className="text-xs text-foreground/40">{m.briefing_dialogue.length} Screens</span>
+                                        <span className="text-[10px] text-foreground/40 font-mono tracking-widest uppercase">{m.briefing_dialogue.length} STAGES</span>
                                     </div>
                                 </div>
                             </div>
