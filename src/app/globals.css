@@ -7,32 +7,16 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  /* Brand Colors (Luxury Deep Chocolate & Cream) */
-  --color-brand-primary: #C49B61;
-  --color-brand-secondary: #2C1B18;
-  --color-brand-accent: #F5E6D3;
-  --color-brand-background: #0F0A08;
-  --color-brand-surface: rgba(26, 17, 13, 0.7);
+  /* Brand Colors (Luxury Theme) */
+  --color-brand-primary: #C49B61; /* Burnished Gold */
+  --color-brand-secondary: #F5E6D3; /* Cream */
+  --color-brand-accent: #14F195; /* Solana Green */
+  --color-brand-background: #1A110D; /* Deep Chocolate */
+  --color-brand-surface: rgba(44, 27, 24, 0.7); /* Translucent Chocolate */
 
   /* Custom Animations */
   --animate-float: float 6s ease-in-out infinite;
   --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  --animate-bounce-x: bounce-x 1s infinite;
-  --animate-glitch: glitch 0.3s cubic-bezier(.25,.46,.45,.94) both infinite;
-
-  @keyframes bounce-x {
-    0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(5px); }
-  }
-
-  @keyframes glitch {
-    0% { transform: translate(0); }
-    20% { transform: translate(-2px, 2px); }
-    40% { transform: translate(-2px, -2px); }
-    60% { transform: translate(2px, 2px); }
-    80% { transform: translate(2px, -2px); }
-    100% { transform: translate(0); }
-  }
 
   @keyframes float {
 
@@ -50,7 +34,7 @@
 /* Base layer overrides */
 @layer base {
   :root {
-    --background: #0F0A08;
+    --background: #1A110D;
     --foreground: #F5E6D3;
   }
 

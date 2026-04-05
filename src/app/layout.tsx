@@ -24,14 +24,23 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isEnvMissing = !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
   return (
     <html lang="en">
       <body
         className={`${inter.variable} ${outfit.variable} antialiased bg-brand-background text-foreground`}
       >
+        {isEnvMissing && (
+          <div className="fixed top-0 left-0 w-full z-[100] bg-brand-accent text-white px-4 py-2 text-center text-xs font-bold uppercase tracking-widest animate-pulse border-b border-white/20">
+            ⚠️ Deployment Warning: Supabase Credentials Missing. Run 'vercel env pull .env.local' to sync.
+          </div>
+        )}
         <AppWalletProvider>
           <TopNav />
-          {children}
+          <div className={isEnvMissing ? "pt-10" : ""}>
+            {children}
+          </div>
         </AppWalletProvider>
       </body>
     </html>
