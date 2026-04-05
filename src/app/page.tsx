@@ -1,4 +1,4 @@
-"use client";
+"use client"; // . rebuild trigger
 
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Sparkles, Zap, Shield } from "lucide-react";
