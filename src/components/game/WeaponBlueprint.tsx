@@ -9,10 +9,11 @@ export function WeaponBlueprint() {
 
     // A hardcoded skeletal list of fragments that make up the "Chronos Weapon"
     const blueprintNodes = [
-        { id: "Quantum Core", name: "Quantum Core", type: "Core", icon: Zap },
-        { id: "Temporal Lens", name: "Temporal Lens", type: "Optics", icon: Target },
-        { id: "Aegis Plating", name: "Aegis Plating", type: "Defense", icon: Shield },
-        { id: "Plasma Emitter", name: "Plasma Emitter", type: "Weaponry", icon: Zap },
+        { id: "The Nexus Core", name: "The Nexus Core", type: "Core", icon: Zap },
+        { id: "The Plasma Emitter", name: "The Plasma Emitter", type: "Weaponry", icon: Zap },
+        { id: "The Targeting Lens", name: "The Targeting Lens", type: "Optics", icon: Target },
+        { id: "The Chrono-Battery", name: "The Chrono-Battery", type: "Energy", icon: Shield },
+        { id: "The Trigger Mechanism", name: "The Trigger Mechanism", type: "Assembly", icon: Zap },
     ];
 
     return (
