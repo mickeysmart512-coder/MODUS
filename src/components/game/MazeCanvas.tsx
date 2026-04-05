@@ -26,6 +26,7 @@ export function MazeCanvas({ onCheckpointReached, onCaught }: MazeCanvasProps) {
 
     const [isPlaying, setIsPlaying] = useState(false);
     const [shieldsLeft, setShieldsLeft] = useState(3);
+    const [turretsLeft, setTurretsLeft] = useState(2);
     const [mazeAssetsLoaded, setMazeAssetsLoaded] = useState(false);
 
     // Images
@@ -39,8 +40,10 @@ export function MazeCanvas({ onCheckpointReached, onCaught }: MazeCanvasProps) {
         keys: { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, w: false, a: false, s: false, d: false }
     });
 
-    const aliens = useRef<{ x: number, y: number, size: number, speed: number, freezeParams: number, frame: number }[]>([]);
+    const aliens = useRef<{ x: number, y: number, size: number, speed: number, freezeParams: number, frame: number, hp: number }[]>([]);
     const shields = useRef<{ x: number, y: number, hp: number }[]>([]);
+    const turrets = useRef<{ x: number, y: number, cooldown: number, hp: number }[]>([]);
+    const bullets = useRef<{ x: number, y: number, vx: number, vy: number }[]>([]);
     const target = useRef({ x: 540, y: 340, size: 30 });
     const reqRef = useRef<number>(null);
     const walls = useRef<number[][]>([]);
@@ -84,12 +87,30 @@ export function MazeCanvas({ onCheckpointReached, onCaught }: MazeCanvasProps) {
         pState.current.x = 20;
         pState.current.y = 20;
 
-        // The higher the level, the more aggressive the dino
-        const alienSpeed = 1.0 + (accountLevel * 0.1);
-        aliens.current = [{ x: 500, y: 300, size: 24, speed: alienSpeed, freezeParams: 0, frame: 0 }];
+        // The higher the level, the more aggressive the dinos
+        const alienSpeed = 1.2 + (accountLevel * 0.05);
+        const alienCount = 1 + Math.floor(accountLevel / 3);
+        
+        const newAliens = [];
+        for (let k = 0; k < alienCount; k++) {
+            // Spawn far from player (start at 20,20)
+            newAliens.push({ 
+                x: 300 + (rand() * 250), 
+                y: 100 + (rand() * 250), 
+                size: 24, 
+                speed: alienSpeed * (0.8 + rand() * 0.4), 
+                freezeParams: 0, 
+                frame: rand() * 10,
+                hp: 100 
+            });
+        }
+        aliens.current = newAliens;
 
         shields.current = [];
-        setShieldsLeft(3 + Math.floor(accountLevel / 5)); // Reward high levels
+        turrets.current = [];
+        bullets.current = [];
+        setShieldsLeft(3 + Math.floor(accountLevel / 5)); 
+        setTurretsLeft(2 + Math.floor(accountLevel / 10));
     }, [accountLevel]);
 
     const checkCollision = (rect1: any, rect2: any) => {
@@ -120,6 +141,13 @@ export function MazeCanvas({ onCheckpointReached, onCaught }: MazeCanvasProps) {
         }
     }, [shieldsLeft, isPlaying]);
 
+    const dropTurret = useCallback(() => {
+        if (turretsLeft > 0 && isPlaying) {
+            turrets.current.push({ x: pState.current.x, y: pState.current.y, cooldown: 0, hp: 100 });
+            setTurretsLeft(t => t - 1);
+        }
+    }, [turretsLeft, isPlaying]);
+
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             const k = e.key;
@@ -130,6 +158,10 @@ export function MazeCanvas({ onCheckpointReached, onCaught }: MazeCanvasProps) {
             if (k === ' ') {
                 e.preventDefault();
                 dropShield();
+            }
+            if (kl === 'e') {
+                e.preventDefault();
+                dropTurret();
             }
 
             if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key) && isPlaying) {
@@ -225,7 +257,14 @@ export function MazeCanvas({ onCheckpointReached, onCaught }: MazeCanvasProps) {
             }
 
             // Handle Aliens (Dinosaurs)
-            for (let alien of aliens.current) {
+            for (let i = aliens.current.length - 1; i >= 0; i--) {
+                let alien = aliens.current[i];
+                
+                if (alien.hp <= 0) {
+                    aliens.current.splice(i, 1);
+                    continue;
+                }
+
                 if (alien.freezeParams > 0) {
                     alien.freezeParams -= dt;
                 } else {
@@ -249,6 +288,16 @@ export function MazeCanvas({ onCheckpointReached, onCaught }: MazeCanvasProps) {
                         s.hp -= 2 * dt;
                         alien.freezeParams = 10;
                         if (s.hp <= 0) shields.current.splice(i, 1);
+                    }
+                }
+
+                // Turret Collisions
+                for (let i = turrets.current.length - 1; i >= 0; i--) {
+                    let t = turrets.current[i];
+                    if (checkCollision({ x: alien.x, y: alien.y, size: alien.size }, { x: t.x, y: t.y, size: 24 })) {
+                        t.hp -= 5 * dt;
+                        alien.freezeParams = 5;
+                        if (t.hp <= 0) turrets.current.splice(i, 1);
                     }
                 }
 
@@ -279,6 +328,74 @@ export function MazeCanvas({ onCheckpointReached, onCaught }: MazeCanvasProps) {
                 ctx.fillRect(s.x, s.y, 24, 24);
                 ctx.shadowBlur = 0;
             });
+
+            // Update & Draw Turrets
+            turrets.current.forEach(t => {
+                // Find nearest alien
+                let nearest = null;
+                let minDist = 200; // Activation range
+                aliens.current.forEach(a => {
+                    const dist = Math.hypot(a.x - t.x, a.y - t.y);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        nearest = a;
+                    }
+                });
+
+                if (nearest && t.cooldown <= 0) {
+                    const angle = Math.atan2((nearest as any).y - t.y, (nearest as any).x - t.x);
+                    bullets.current.push({
+                        x: t.x + 12, y: t.y + 12,
+                        vx: Math.cos(angle) * 8, vy: Math.sin(angle) * 8
+                    });
+                    t.cooldown = 40; // Firing rate
+                }
+
+                if (t.cooldown > 0) t.cooldown -= dt;
+
+                // Draw Turret
+                ctx.fillStyle = "#4a4a4a";
+                ctx.fillRect(t.x, t.y, 24, 24);
+                ctx.fillStyle = "#8B5CF6";
+                ctx.beginPath();
+                ctx.arc(t.x + 12, t.y + 12, 6, 0, Math.PI * 2);
+                ctx.fill();
+                // Scanning light
+                ctx.strokeStyle = "rgba(139, 92, 246, 0.5)";
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(t.x + 12, t.y + 12, 12, 0, Math.PI * 2);
+                ctx.stroke();
+            });
+
+            // Update & Draw Bullets
+            for (let i = bullets.current.length - 1; i >= 0; i--) {
+                const b = bullets.current[i];
+                b.x += b.vx * dt;
+                b.y += b.vy * dt;
+
+                // Collision with Aliens
+                let hit = false;
+                aliens.current.forEach(a => {
+                   if (checkCollision({ x: b.x - 2, y: b.y - 2, size: 4 }, { x: a.x, y: a.y, size: a.size })) {
+                       a.hp -= 10;
+                       a.freezeParams = 5;
+                       hit = true;
+                   }
+                });
+
+                if (hit || b.x < 0 || b.x > 600 || b.y < 0 || b.y > 400) {
+                    bullets.current.splice(i, 1);
+                } else {
+                    ctx.fillStyle = "#F5E6D3";
+                    ctx.shadowColor = "#F5E6D3";
+                    ctx.shadowBlur = 10;
+                    ctx.beginPath();
+                    ctx.arc(b.x, b.y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+            }
 
             // Draw Top-Down Player using User's Avatar Config
             const skinCol = avatarConfig?.skinColor?.[0] ? `#${avatarConfig.skinColor[0]}` : "#edb98a";
@@ -334,7 +451,12 @@ export function MazeCanvas({ onCheckpointReached, onCaught }: MazeCanvasProps) {
                     <div className="flex items-center space-x-1 text-xs font-mono text-white/70 bg-white/5 px-3 py-1 rounded-md border border-white/10">
                         <Shield className="w-3 h-3 text-brand-secondary" />
                         <span>Shields: {shieldsLeft}</span>
-                        <span className="text-white/40 ml-1">(SPACE key)</span>
+                        <span className="text-white/40 ml-1">(SPACE)</span>
+                    </div>
+                    <div className="flex items-center space-x-1 text-xs font-mono text-white/70 bg-white/5 px-3 py-1 rounded-md border border-white/10">
+                        <Crosshair className="w-3 h-3 text-brand-primary" />
+                        <span>Turrets: {turretsLeft}</span>
+                        <span className="text-white/40 ml-1">(E key)</span>
                     </div>
                 </div>
             </div>
@@ -360,7 +482,7 @@ export function MazeCanvas({ onCheckpointReached, onCaught }: MazeCanvasProps) {
                                 <Crosshair className="w-12 h-12 text-brand-primary mb-4" />
                                 <h3 className="font-heading text-2xl font-bold text-white mb-2">Sector Lvl {accountLevel}</h3>
                                 <p className="text-white/70 mb-6 text-sm">
-                                    Use WASD or ARROW KEYS to navigate to the green checkpoint. Dinosaurs will track your movement. Drop shields using SPACE.
+                                    Use WASD or ARROW KEYS to navigate to the green checkpoint. Dinosaurs will track your movement. Drop shields using SPACE and Turrets using E.
                                 </p>
                                 <button
                                     onClick={initGame}
