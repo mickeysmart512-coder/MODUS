@@ -13,9 +13,16 @@ type FlowPhase = 'loading' | 'briefing' | 'maze' | 'success' | 'failure' | 'comp
 export default function DashboardPage() {
     const { addSecuredFragment, fragmentsSecured } = useAuthStore();
     const [mission, setMission] = useState<DailyMission | null>(null);
+    const [season, setSeason] = useState<string>("Season 1");
     const [phase, setPhase] = useState<FlowPhase>('loading');
 
     useEffect(() => {
+        const fetchConfig = async () => {
+             const { data } = await supabase.from('system_settings').select('active_season').eq('id', 1).single();
+             if (data) setSeason(data.active_season);
+        };
+        fetchConfig();
+
         const fetchTodayMission = async () => {
             const today = new Date().toISOString().split('T')[0];
             const { data } = await supabase.from('daily_missions').select('*').eq('active_date', today).single();
@@ -59,9 +66,15 @@ export default function DashboardPage() {
 
     return (
         <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-[1400px] mx-auto space-y-12">
-            <div>
-                <h1 className="text-4xl font-bold font-heading text-white mb-2 tracking-tight">Tactical Command</h1>
-                <p className="text-foreground/60 text-lg">Oversee agent operations and secure active breaches.</p>
+            <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-white/5 pb-8">
+                <div>
+                    <div className="flex items-center space-x-2 mb-2">
+                        <span className="px-3 py-1 bg-brand-primary/20 text-brand-primary text-[10px] font-black uppercase tracking-[0.3em] border border-brand-primary/30 rounded-full animate-pulse">{season} ACTIVE</span>
+                        <span className="text-white/20 text-[10px] font-black uppercase tracking-widest">Protocol Staged</span>
+                    </div>
+                    <h1 className="text-5xl font-bold font-heading text-white tracking-tighter">Tactical Command</h1>
+                    <p className="text-foreground/60 text-lg">Oversee agent operations and secure active breaches.</p>
+                </div>
             </div>
 
             {/* The Chronos Campaign Layout */}

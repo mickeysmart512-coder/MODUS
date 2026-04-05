@@ -12,6 +12,7 @@ import ItemsManager from "./ItemsManager";
 import AnnouncementsManager from "./AnnouncementsManager";
 import SeasonsManager from "./SeasonsManager";
 import SystemSettingsManager from "./SystemSettingsManager";
+import { generateSeasonMissions, CHRONOS_TRILOGY } from "@/lib/chronos_script";
 import dynamic from "next/dynamic";
 
 const WalletMultiButton = dynamic(
@@ -62,6 +63,10 @@ export default function AdminDashboard() {
     const [briefing, setBriefing] = useState("");
     const [success, setSuccess] = useState("");
     const [failure, setFailure] = useState("");
+
+    // Season Seeder State
+    const [seedSeasonId, setSeedSeasonId] = useState(1);
+    const [seedStartDate, setSeedStartDate] = useState(new Date().toISOString().split('T')[0]);
 
     useEffect(() => {
         const verifyAdminWallet = async () => {
@@ -225,57 +230,21 @@ export default function AdminDashboard() {
     };
 
     const seedCampaign = async () => {
-        const confirmSeed = confirm("Infect 5 official campaign days?");
+        const confirmSeed = confirm(`INITIALIZE CHRONOS TRILOGY? This will launch Season ${seedSeasonId} (${CHRONOS_TRILOGY[seedSeasonId].name}) starting from ${seedStartDate}. (50 Daily Directives). Proceed?`);
         if (!confirmSeed) return;
 
-        const campaign = [
-            {
-                title: 'The Awakening',
-                fragment_name: 'The Nexus Core',
-                briefing_dialogue: ['Sentinel, wake up. The grid is compromised.', 'The Time-Eaters have breached.', 'Find the Nexus Core.', 'Go.'],
-                success_dialogue: ['Core secured.'],
-                failure_dialogue: ['Sentinel down.']
-            },
-            {
-                title: 'The Blockade',
-                fragment_name: 'The Plasma Emitter',
-                briefing_dialogue: ['Shields up.', 'Sector 4 is swarming.', 'Secure the Plasma Emitter.'],
-                success_dialogue: ['Emitter acquired.'],
-                failure_dialogue: ['Shields failed.']
-            },
-            {
-                title: 'Offensive Measures',
-                fragment_name: 'The Targeting Lens',
-                briefing_dialogue: ['Turrets authorized.', 'Deploy them now.', 'Get the Targeting Lens.'],
-                success_dialogue: ['Lens secured.'],
-                failure_dialogue: ['Overrun.']
-            },
-            {
-                title: 'The Dead Zone',
-                fragment_name: 'The Chrono-Battery',
-                briefing_dialogue: ['Visibility is low.', 'Numbers have doubled.', 'Need the Chrono-Battery.'],
-                success_dialogue: ['Battery slotted.'],
-                failure_dialogue: ['Signal lost.']
-            },
-            {
-                title: 'The First Assembly',
-                fragment_name: 'The Trigger Mechanism',
-                briefing_dialogue: ['Final piece.', 'Everything is coming at you.', 'Get the Trigger.'],
-                success_dialogue: ['TRIGGER SECURED! Phase 1 complete.'],
-                failure_dialogue: ['Target lost.']
-            }
-        ];
+        const missionsWithDates = generateSeasonMissions(seedSeasonId, new Date(seedStartDate));
 
-        const today = new Date();
-        const missionsWithDates = campaign.map((m, i) => {
-            const date = new Date(today);
-            date.setDate(today.getDate() + i);
-            return { ...m, active_date: date.toISOString().split('T')[0] };
-        });
-
+        // Use a single transaction for efficiency
         const { error } = await supabase.from('daily_missions').upsert(missionsWithDates, { onConflict: 'active_date' });
-        if (error) toast.error(error.message);
-        else { toast.success("Campaign Injected!"); fetchMissions(); }
+        
+        if (error) {
+            console.error("Seeding Error:", error);
+            toast.error(error.message);
+        } else {
+            toast.success(`Season ${seedSeasonId} Strategic Directives Launched!`);
+            fetchMissions();
+        }
     };
 
     const handleLogout = async () => {
@@ -436,16 +405,39 @@ export default function AdminDashboard() {
         <div className="space-y-8 animate-in fade-in duration-500 pb-16">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold font-heading text-white tracking-tight">Chronos Breach Controller</h1>
-                    <p className="text-foreground/60 text-sm">Schedule and override campaign protocols.</p>
+                    <h1 className="text-3xl font-bold font-heading text-white tracking-tight text-glow">The Chronos Trilogy</h1>
+                    <p className="text-foreground/60 text-sm">Strategic Campaign Deployment & Logic Overrides.</p>
                 </div>
-                <button
-                    onClick={seedCampaign}
-                    className="px-6 py-2 bg-brand-secondary/10 border border-brand-secondary/30 text-brand-secondary rounded-full font-bold text-xs hover:bg-brand-secondary/20 transition-all flex items-center space-x-2"
-                >
-                    <Plus className="w-4 h-4" />
-                    <span>Seed Official Script</span>
-                </button>
+                <div className="flex items-center space-x-4">
+                    <div className="flex flex-col">
+                        <label className="text-[10px] uppercase text-brand-primary font-bold mb-1 ml-1">Target Season</label>
+                        <select 
+                            value={seedSeasonId} 
+                            onChange={e => setSeedSeasonId(Number(e.target.value))}
+                            className="bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-xs text-white outline-none focus:border-brand-primary"
+                        >
+                            <option value={1}>Season 1: Aegis Protocol</option>
+                            <option value={2}>Season 2: Shadow Nexus</option>
+                            <option value={3}>Season 3: Eradication</option>
+                        </select>
+                    </div>
+                    <div className="flex flex-col text-white">
+                        <label className="text-[10px] uppercase text-brand-primary font-bold mb-1 ml-1">Launch Date</label>
+                        <input 
+                            type="date" 
+                            value={seedStartDate} 
+                            onChange={e => setSeedStartDate(e.target.value)}
+                            className="bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-xs text-white outline-none focus:border-brand-primary"
+                        />
+                    </div>
+                    <button
+                        onClick={seedCampaign}
+                        className="mt-4 px-6 py-2 bg-brand-primary text-black rounded-full font-bold text-xs hover:bg-brand-primary/80 transition-all flex items-center space-x-2 shadow-[0_0_20px_rgba(139,92,246,0.3)] animate-pulse"
+                    >
+                        <Plus className="w-4 h-4" />
+                        <span>Launch Strategic Campaign</span>
+                    </button>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
