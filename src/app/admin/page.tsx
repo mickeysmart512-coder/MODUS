@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { supabase, DailyMission, SystemSettings } from "@/lib/supabase";
-import { ShieldAlert, Plus, Save, Trash2, Calendar } from "lucide-react";
+import { ShieldAlert, Plus, Save, Trash2, Calendar, Database } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function AdminPage() {
@@ -63,6 +63,89 @@ export default function AdminPage() {
             fetchMissions();
             // Reset form
             setActiveDate(''); setTitle(''); setFragmentName(''); setBriefing(''); setSuccess(''); setFailure('');
+        }
+    };
+
+    const handleSeedCampaign = async () => {
+        if (!confirm("This will inject the 5 official campaign days starting from today. Continue?")) return;
+
+        const campaign = [
+            {
+                title: 'The Awakening',
+                fragment_name: 'The Nexus Core',
+                briefing_dialogue: [
+                    'Sentinel, wake up. The grid is compromised.',
+                    'The Time-Eaters—Chronos-Aliens—have breached our timeline. They are feeding on our past.',
+                    'We have the blueprints for the \'Aegis Weapon\' to wipe them out, but the pieces are scattered across the Time-Mazes.',
+                    'Your first target is the Nexus Core. Get in, grab it, and do not let them touch you. Go.'
+                ],
+                success_dialogue: ['Core secured. Excellent work, Sentinel. We are one step closer to taking our land back.'],
+                failure_dialogue: ['Sentinel is down! They stripped the timeline. We have to try again tomorrow.']
+            },
+            {
+                title: 'The Blockade',
+                fragment_name: 'The Plasma Emitter',
+                briefing_dialogue: [
+                    'The Chronos-Aliens noticed you yesterday. They are swarming Sector 4.',
+                    'We are dropping deployable Energy Shields into your inventory. Use them to block the narrow corridors.',
+                    'Your target is the Plasma Emitter. Drop the shields to stall them, grab the piece, and extract.'
+                ],
+                success_dialogue: ['Plasma Emitter acquired. The weapon is taking shape on the dashboard.'],
+                failure_dialogue: ['The shields didn\'t hold! Command, we lost the package. We\'ll reset the grid for tomorrow.']
+            },
+            {
+                title: 'Offensive Measures',
+                fragment_name: 'The Targeting Lens',
+                briefing_dialogue: [
+                    'Shields aren\'t going to be enough anymore. They are adapting.',
+                    'I\'ve authorized the deployment of automated Turrets. Place them strategically; they will fire automatically when the beasts get close.',
+                    'The Targeting Lens is at the center of the labyrinth. Secure it.'
+                ],
+                success_dialogue: ['Lens secured. Good placement on those turrets. We almost have a functional prototype.'],
+                failure_dialogue: ['Overrun! They moved too fast. Recalibrate your defenses for the next attempt.']
+            },
+            {
+                title: 'The Dead Zone',
+                fragment_name: 'The Chrono-Battery',
+                briefing_dialogue: [
+                    'This sector has been completely drained by the Time-Eaters. It\'s a dead zone.',
+                    'Visibility is low, and their numbers have doubled.',
+                    'You need the Chrono-Battery to power the Aegis Weapon. If you fail today, we lose massive ground. Stay sharp.'
+                ],
+                success_dialogue: ['Battery is slotted in. The weapon is pulsing. Just one piece left for this phase.'],
+                failure_dialogue: ['We lost the signal! Sentinel, pull back! We have to wait for the storm to clear tomorrow.']
+            },
+            {
+                title: 'The First Assembly',
+                fragment_name: 'The Trigger Mechanism',
+                briefing_dialogue: [
+                    'This is it, Sentinel. The final piece for Phase 1: The Trigger Mechanism.',
+                    'They know what you are trying to do. They are throwing everything at this maze.',
+                    'Use every shield and turret you have. Get that trigger, and we can finally push them back.'
+                ],
+                success_dialogue: ['TRIGGER SECURED! The Aegis Weapon Phase 1 is fully assembled. Incredible work, Architect. Prepare for the next phase.'],
+                failure_dialogue: ['They reached the trigger before us! Damn it! Hold the line, we try again in 24 hours.']
+            }
+        ];
+
+        try {
+            const today = new Date();
+            const inserts = campaign.map((m, i) => {
+                const date = new Date();
+                date.setDate(today.getDate() + i);
+                return {
+                    ...m,
+                    active_date: date.toISOString().split('T')[0]
+                };
+            });
+
+            const { error } = await supabase.from('daily_missions').insert(inserts);
+            if (error) throw error;
+
+            toast.success("5-Day Campaign Injected!");
+            fetchMissions();
+        } catch (e: any) {
+            toast.error(e.message);
         }
     };
 
@@ -145,9 +228,18 @@ export default function AdminPage() {
 
                 {/* Display Scheduled Missions */}
                 <div className="space-y-6">
-                    <h2 className="text-xl font-bold text-white flex items-center mb-6 pl-2">
-                        <Calendar className="w-5 h-5 text-brand-secondary mr-2" />
-                        Scheduled Protocol Breaches
+                    <h2 className="text-xl font-bold text-white flex items-center mb-6 pl-2 justify-between">
+                        <div className="flex items-center">
+                           <Calendar className="w-5 h-5 text-brand-secondary mr-2" />
+                           Scheduled Protocol Breaches
+                        </div>
+                        <button 
+                            onClick={handleSeedCampaign}
+                            className="text-[10px] bg-brand-primary/10 hover:bg-brand-primary/20 text-brand-primary border border-brand-primary/30 px-3 py-1 rounded-full uppercase tracking-widest font-bold flex items-center transition-all"
+                        >
+                            <Database className="w-3 h-3 mr-1" />
+                            Seed Official Script
+                        </button>
                     </h2>
 
                     <div className="space-y-4 max-h-[700px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/10">

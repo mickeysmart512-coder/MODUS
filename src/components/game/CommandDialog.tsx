@@ -60,75 +60,97 @@ export function CommandDialog({ mission, dialogueType, onComplete }: CommandDial
     const isSuccess = dialogueType === "success";
     const isFailure = dialogueType === "failure";
 
+    // Check if it's the last screen of the briefing
+    const isBriefing = dialogueType === "briefing";
+    const isLastScreen = currentScreen === dialogueLines.length - 1;
+
     return (
-        <div className="glass-panel border-white/10 relative overflow-hidden bg-gradient-to-br from-[#1A110D] to-[#0a0604] min-h-[500px] flex flex-col justify-end shadow-2xl">
-            {/* Background Elements */}
-            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5" />
-            <div className={`absolute top-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full blur-[100px] ${isSuccess ? 'bg-brand-primary/20' : isFailure ? 'bg-red-500/10' : 'bg-brand-accent/10'}`} />
+        <div className="glass-panel border-white/10 relative overflow-hidden bg-[#0a0604] min-h-[500px] flex flex-col justify-end shadow-2xl">
+            {/* Background Narrative Lighting */}
+            <div className={`absolute inset-0 transition-colors duration-1000 ${isSuccess ? 'bg-green-500/5' : isFailure ? 'bg-red-500/10' : 'bg-brand-primary/5'}`} />
+            
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
 
             {/* Header */}
-            <div className="absolute top-0 w-full p-4 border-b border-white/5 flex justify-between items-center z-10 bg-black/40 backdrop-blur-md">
+            <div className="absolute top-0 w-full p-4 border-b border-white/5 flex justify-between items-center z-30 bg-black/60 backdrop-blur-md">
                 <div className="flex items-center space-x-3">
-                    {isSuccess ? <CheckCircle2 className="w-5 h-5 text-brand-primary" /> : isFailure ? <ShieldAlert className="w-5 h-5 text-red-500" /> : <div className="w-2 h-2 rounded-full bg-brand-accent animate-pulse" />}
-                    <h2 className="font-heading font-bold text-white tracking-widest uppercase text-sm">
-                        {dialogueType === "briefing" ? "Incoming Transmission" : "Mission Report"}
+                    {isSuccess ? <CheckCircle2 className="w-5 h-5 text-green-400" /> : isFailure ? <ShieldAlert className="w-5 h-5 text-red-500" /> : <div className="w-2 h-2 rounded-full bg-brand-primary animate-pulse" />}
+                    <h2 className="font-heading font-bold text-white tracking-widest uppercase text-xs">
+                        {dialogueType === "briefing" ? "Nexus Protocol: Incoming" : "Terminal: Mission Log"}
                     </h2>
-                </div>
-                <div className="text-xs font-mono text-white/50 bg-white/5 px-2 py-1 rounded-sm border border-white/10">
-                    SECURE CHANNEL
                 </div>
             </div>
 
-            {/* Character Portrait */}
+            {/* Commander Silhouette */}
             <AnimatePresence mode="wait">
                 <motion.div
-                    key="commander"
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="absolute bottom-12 left-0 w-full max-w-[400px] aspect-[4/3] pointer-events-none z-10 drop-shadow-[0_0_30px_rgba(0,0,0,0.8)]"
+                    key="commander-silhouette"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none"
                 >
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#140D0A] via-transparent to-transparent z-10" />
-                    <img
-                        src={isFailure ? "https://api.dicebear.com/7.x/bottts/svg?seed=CommanderFail&colors=red" : "https://api.dicebear.com/7.x/bottts/svg?seed=Commander&primaryColor=C49B61"}
-                        alt="Command"
-                        className={`w-full h-full object-contain ${isFailure ? 'grayscale opacity-70 sepia' : ''}`}
-                    />
+                    <div className="relative w-full h-full max-w-[600px] opacity-40 mix-blend-overlay">
+                         <img
+                            src="https://api.dicebear.com/7.x/bottts/svg?seed=NexusCommand&primaryColor=C49B61&backgroundColor=transparent"
+                            alt="Command Silhouette"
+                            className="w-full h-full object-contain brightness-0 invert opacity-20"
+                        />
+                         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0604] via-transparent to-transparent" />
+                    </div>
                 </motion.div>
             </AnimatePresence>
 
-            {/* Dialogue Box */}
-            <div className="relative z-20 w-full p-4 sm:p-8 shrink-0">
-                <div
-                    onClick={handleNext}
-                    className="w-full bg-[#1A110D]/90 backdrop-blur-lg border border-brand-primary/30 rounded-2xl p-6 sm:p-8 cursor-pointer group shadow-[0_-10px_30px_rgba(0,0,0,0.5)] transition-all hover:border-brand-primary/60"
+            {/* Comic Cloud Dialogue */}
+            <div className="relative z-20 w-full p-6 sm:p-12 flex flex-col items-center">
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    key={currentScreen}
+                    className="relative max-w-2xl w-full"
                 >
-                    <div className="flex justify-between items-start mb-4">
-                        <h3 className={`font-bold font-heading uppercase tracking-widest text-lg ${isFailure ? 'text-red-400' : 'text-brand-primary'}`}>
-                            Nexus Command
-                        </h3>
-                        <span className="text-[10px] text-white/30 font-mono tracking-widest">
-                            LGG-{(currentScreen + 1).toString().padStart(2, '0')}/{dialogueLines.length.toString().padStart(2, '0')}
-                        </span>
-                    </div>
+                    {/* The Speech Bubble */}
+                    <div className="bg-white/5 backdrop-blur-xl border-2 border-brand-primary/40 rounded-[2.5rem] p-8 sm:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative">
+                        {/* The Bubble Tail */}
+                        <div className="absolute bottom-[-20px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[20px] border-l-transparent border-r-[20px] border-r-transparent border-t-[20px] border-t-brand-primary/40"></div>
+                        <div className="absolute bottom-[-16px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[18px] border-l-transparent border-r-[18px] border-r-transparent border-t-[18px] border-t-[#16110e]"></div>
 
-                    <div className="min-h-[80px]">
-                        <p className="text-white/90 text-lg sm:text-xl font-light leading-relaxed">
-                            {displayedText}
-                            {isTyping && <span className="inline-block w-2 h-5 bg-brand-primary ml-1 animate-pulse" />}
-                        </p>
-                    </div>
+                        <div className="flex flex-col space-y-6">
+                            <div className="flex justify-between items-center">
+                                <span className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.3em]">
+                                    {isSuccess ? "Transmission Complete" : isFailure ? "Signal Lost" : `Data Chunk ${currentScreen + 1}/${dialogueLines.length}`}
+                                </span>
+                                <div className="flex space-x-1">
+                                    {[...Array(dialogueLines.length)].map((_, i) => (
+                                        <div key={i} className={`w-1.5 h-1.5 rounded-full ${i === currentScreen ? 'bg-brand-primary shadow-[0_0_8px_#C49B61]' : 'bg-white/10'}`} />
+                                    ))}
+                                </div>
+                            </div>
 
-                    <div className="mt-6 flex justify-end">
-                        <motion.div
-                            animate={{ x: isTyping ? 0 : [0, 5, 0] }}
-                            transition={{ repeat: isTyping ? 0 : Infinity, duration: 1 }}
-                            className={`flex items-center text-xs font-bold uppercase tracking-widest ${isTyping ? 'text-white/20' : 'text-brand-primary group-hover:text-white transition-colors'}`}
-                        >
-                            <span>{isTyping ? "Skip" : currentScreen < dialogueLines.length - 1 ? "Next" : "Acknowledge"}</span>
-                            <ChevronRight className="w-4 h-4 ml-1" />
-                        </motion.div>
+                            <div className="min-h-[100px]">
+                                <p className="text-white/95 text-xl sm:text-2xl font-medium leading-relaxed italic font-serif">
+                                    "{displayedText}"
+                                    {isTyping && <span className="inline-block w-1.5 h-6 bg-brand-primary ml-2 animate-pulse" />}
+                                </p>
+                            </div>
+
+                            <div className="flex justify-end pt-4">
+                                <button
+                                    onClick={handleNext}
+                                    disabled={isTyping && !isLastScreen && isBriefing}
+                                    className={`px-8 py-3 rounded-full font-bold uppercase tracking-widest text-xs transition-all duration-300 flex items-center space-x-2 
+                                        ${isLastScreen && isBriefing 
+                                            ? 'bg-brand-primary text-black shadow-[0_0_25px_rgba(196,155,97,0.5)] hover:scale-105 active:scale-95' 
+                                            : 'bg-white/5 text-brand-primary border border-brand-primary/30 hover:bg-white/10'}`}
+                                >
+                                    <span>
+                                        {isTyping ? "Skip" : (isLastScreen && isBriefing ? "Initialize Breach" : isLastScreen ? "Acknowledge" : "Next")}
+                                    </span>
+                                    <ChevronRight className={`w-4 h-4 ${isLastScreen && isBriefing ? 'animate-bounce-x' : ''}`} />
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </motion.div>
             </div>
         </div>
     );
