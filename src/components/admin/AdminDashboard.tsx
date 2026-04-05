@@ -563,17 +563,17 @@ export default function AdminDashboard() {
 
                                 <div>
                                     <label className="block text-[10px] uppercase tracking-wider text-brand-primary font-bold mb-2">Briefing Sequence (Newline = Next Slide)</label>
-                                    <textarea rows={6} value={Array.isArray(editingMission.briefing_dialogue) ? editingMission.briefing_dialogue.join('\n') : editingMission.briefing_dialogue} onChange={e => setEditingMission({ ...editingMission, briefing_dialogue: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-xs font-mono outline-none focus:border-brand-primary resize-none" />
+                                    <textarea rows={6} value={Array.isArray(editingMission.briefing_dialogue) ? editingMission.briefing_dialogue.join('\n') : editingMission.briefing_dialogue} onChange={e => setEditingMission({ ...editingMission, briefing_dialogue: e.target.value.split('\n') })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-xs font-mono outline-none focus:border-brand-primary resize-none" />
                                 </div>
 
                                 <div className="grid grid-cols-1 gap-4 text-white">
                                     <div>
                                         <label className="block text-[10px] uppercase tracking-wider text-green-400 font-bold mb-2">Success Outcome</label>
-                                        <textarea rows={2} value={Array.isArray(editingMission.success_dialogue) ? editingMission.success_dialogue.join('\n') : editingMission.success_dialogue} onChange={e => setEditingMission({ ...editingMission, success_dialogue: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-xs" />
+                                        <textarea rows={2} value={Array.isArray(editingMission.success_dialogue) ? editingMission.success_dialogue.join('\n') : editingMission.success_dialogue} onChange={e => setEditingMission({ ...editingMission, success_dialogue: e.target.value.split('\n') })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-xs" />
                                     </div>
                                     <div>
                                         <label className="block text-[10px] uppercase tracking-wider text-red-400 font-bold mb-2">Failure Outcome</label>
-                                        <textarea rows={2} value={Array.isArray(editingMission.failure_dialogue) ? editingMission.failure_dialogue.join('\n') : editingMission.failure_dialogue} onChange={e => setEditingMission({ ...editingMission, failure_dialogue: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-xs" />
+                                        <textarea rows={2} value={Array.isArray(editingMission.failure_dialogue) ? editingMission.failure_dialogue.join('\n') : editingMission.failure_dialogue} onChange={e => setEditingMission({ ...editingMission, failure_dialogue: e.target.value.split('\n') })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-xs" />
                                     </div>
                                 </div>
                             </div>
