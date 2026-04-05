@@ -148,9 +148,10 @@ export default function AdminPage() {
             };
         });
 
-        const { error } = await supabase.from('daily_missions').insert(missionsWithDates);
+        const { error } = await supabase.from('daily_missions').upsert(missionsWithDates, { onConflict: 'active_date' });
         if (error) {
-            toast.error(error.message);
+            console.error("Seeding Error:", error);
+            toast.error(`Seeding Failed: ${error.message}`);
         } else {
             toast.success("5-Day Campaign Injected Successfully!");
             fetchMissions();
