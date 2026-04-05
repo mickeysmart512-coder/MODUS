@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { Users, Package, Settings, Database, Activity, Lock, LogOut, LayoutDashboard, Search, ChevronRight, Megaphone, CalendarDays } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Users, Package, Settings, Database, Activity, Lock, LogOut, LayoutDashboard, Search, ChevronRight, Megaphone, CalendarDays, Zap, Plus, Save, Trash2, Calendar, Pencil, X } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
-import { supabase, Activity as SupabaseActivity, User } from "@/lib/supabase";
+import { supabase, Activity as SupabaseActivity, User, DailyMission } from "@/lib/supabase";
+import toast from "react-hot-toast";
 
 import ItemsManager from "./ItemsManager";
 import AnnouncementsManager from "./AnnouncementsManager";
@@ -22,6 +23,7 @@ const SIDEBAR_ITEMS = [
     { id: 'overview', label: 'Dashboard Overview', icon: LayoutDashboard },
     { id: 'users', label: 'User Directory', icon: Users },
     { id: 'items', label: 'Items & Generation', icon: Package },
+    { id: 'chronos', label: 'Chronos Breach', icon: Zap },
     { id: 'announcements', label: 'Announcements', icon: Megaphone },
     { id: 'seasons', label: 'Seasons & Epochs', icon: CalendarDays },
     { id: 'settings', label: 'System Settings', icon: Settings },
@@ -48,6 +50,18 @@ export default function AdminDashboard() {
     // Loading state
     const [isLoadingMetrics, setIsLoadingMetrics] = useState(false);
     const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+
+    // Chronos Breach Mission State
+    const [missions, setMissions] = useState<DailyMission[]>([]);
+    const [editingMission, setEditingMission] = useState<DailyMission | null>(null);
+
+    // Create Mission Form State
+    const [activeDate, setActiveDate] = useState("");
+    const [title, setTitle] = useState("");
+    const [fragmentName, setFragmentName] = useState("");
+    const [briefing, setBriefing] = useState("");
+    const [success, setSuccess] = useState("");
+    const [failure, setFailure] = useState("");
 
     useEffect(() => {
         const verifyAdminWallet = async () => {
@@ -143,6 +157,126 @@ export default function AdminDashboard() {
             fetchUsers();
         }
     }, [isAdmin, activeTab, allUsers.length]);
+
+    // Fetch Missions if 'chronos' tab is selected
+    useEffect(() => {
+        if (!isAdmin || activeTab !== 'chronos') return;
+        fetchMissions();
+    }, [isAdmin, activeTab]);
+
+    const fetchMissions = async () => {
+        const { data } = await supabase.from('daily_missions').select('*').order('active_date', { ascending: false });
+        if (data) setMissions(data);
+    };
+
+    const handleCreateMission = async () => {
+        if (!activeDate || !title || !fragmentName) {
+            toast.error("Please fill all required fields");
+            return;
+        }
+
+        const newMission = {
+            active_date: activeDate,
+            title,
+            fragment_name: fragmentName,
+            briefing_dialogue: briefing.split('\n').filter(s => s.trim() !== ''),
+            success_dialogue: success.split('\n').filter(s => s.trim() !== ''),
+            failure_dialogue: failure.split('\n').filter(s => s.trim() !== '')
+        };
+
+        const { error } = await supabase.from('daily_missions').insert([newMission]);
+        if (error) {
+            toast.error(error.message);
+        } else {
+            toast.success("Mission Scheduled!");
+            fetchMissions();
+            setActiveDate(''); setTitle(''); setFragmentName(''); setBriefing(''); setSuccess(''); setFailure('');
+        }
+    };
+
+    const handleDeleteMission = async (id: string) => {
+        if (!confirm("Are you sure?")) return;
+        const { error } = await supabase.from('daily_missions').delete().eq('id', id);
+        if (!error) {
+            toast.success("Mission Deleted");
+            fetchMissions();
+        }
+    };
+
+    const handleUpdateMission = async () => {
+        if (!editingMission) return;
+
+        const updatedMission = {
+            title: editingMission.title,
+            fragment_name: editingMission.fragment_name,
+            briefing_dialogue: Array.isArray(editingMission.briefing_dialogue) ? editingMission.briefing_dialogue : String(editingMission.briefing_dialogue).split('\n').filter(s => s.trim() !== ''),
+            success_dialogue: Array.isArray(editingMission.success_dialogue) ? editingMission.success_dialogue : String(editingMission.success_dialogue).split('\n').filter(s => s.trim() !== ''),
+            failure_dialogue: Array.isArray(editingMission.failure_dialogue) ? editingMission.failure_dialogue : String(editingMission.failure_dialogue).split('\n').filter(s => s.trim() !== '')
+        };
+
+        const { error } = await supabase.from('daily_missions').update(updatedMission).eq('id', editingMission.id);
+        if (error) {
+            toast.error(error.message);
+        } else {
+            toast.success("Mission Updated!");
+            setEditingMission(null);
+            fetchMissions();
+        }
+    };
+
+    const seedCampaign = async () => {
+        const confirmSeed = confirm("Infect 5 official campaign days?");
+        if (!confirmSeed) return;
+
+        const campaign = [
+            {
+                title: 'The Awakening',
+                fragment_name: 'The Nexus Core',
+                briefing_dialogue: ['Sentinel, wake up. The grid is compromised.', 'The Time-Eaters have breached.', 'Find the Nexus Core.', 'Go.'],
+                success_dialogue: ['Core secured.'],
+                failure_dialogue: ['Sentinel down.']
+            },
+            {
+                title: 'The Blockade',
+                fragment_name: 'The Plasma Emitter',
+                briefing_dialogue: ['Shields up.', 'Sector 4 is swarming.', 'Secure the Plasma Emitter.'],
+                success_dialogue: ['Emitter acquired.'],
+                failure_dialogue: ['Shields failed.']
+            },
+            {
+                title: 'Offensive Measures',
+                fragment_name: 'The Targeting Lens',
+                briefing_dialogue: ['Turrets authorized.', 'Deploy them now.', 'Get the Targeting Lens.'],
+                success_dialogue: ['Lens secured.'],
+                failure_dialogue: ['Overrun.']
+            },
+            {
+                title: 'The Dead Zone',
+                fragment_name: 'The Chrono-Battery',
+                briefing_dialogue: ['Visibility is low.', 'Numbers have doubled.', 'Need the Chrono-Battery.'],
+                success_dialogue: ['Battery slotted.'],
+                failure_dialogue: ['Signal lost.']
+            },
+            {
+                title: 'The First Assembly',
+                fragment_name: 'The Trigger Mechanism',
+                briefing_dialogue: ['Final piece.', 'Everything is coming at you.', 'Get the Trigger.'],
+                success_dialogue: ['TRIGGER SECURED! Phase 1 complete.'],
+                failure_dialogue: ['Target lost.']
+            }
+        ];
+
+        const today = new Date();
+        const missionsWithDates = campaign.map((m, i) => {
+            const date = new Date(today);
+            date.setDate(today.getDate() + i);
+            return { ...m, active_date: date.toISOString().split('T')[0] };
+        });
+
+        const { error } = await supabase.from('daily_missions').upsert(missionsWithDates, { onConflict: 'active_date' });
+        if (error) toast.error(error.message);
+        else { toast.success("Campaign Injected!"); fetchMissions(); }
+    };
 
     const handleLogout = async () => {
         setIsAdmin(false);
@@ -295,6 +429,162 @@ export default function AdminDashboard() {
                     </div>
                 </div>
             </div>
+        </div>
+    );
+
+    const renderChronosBreach = () => (
+        <div className="space-y-8 animate-in fade-in duration-500 pb-16">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold font-heading text-white tracking-tight">Chronos Breach Controller</h1>
+                    <p className="text-foreground/60 text-sm">Schedule and override campaign protocols.</p>
+                </div>
+                <button
+                    onClick={seedCampaign}
+                    className="px-6 py-2 bg-brand-secondary/10 border border-brand-secondary/30 text-brand-secondary rounded-full font-bold text-xs hover:bg-brand-secondary/20 transition-all flex items-center space-x-2"
+                >
+                    <Plus className="w-4 h-4" />
+                    <span>Seed Official Script</span>
+                </button>
+            </div>
+
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                {/* Form Editor */}
+                <div className="glass-panel p-6 space-y-6 bg-black/40 border-white/5 relative overflow-hidden">
+                    <h2 className="text-lg font-bold text-white flex items-center mb-4 border-b border-brand-primary/20 pb-4 tracking-widest uppercase">
+                        <Plus className="w-5 h-5 text-brand-primary mr-2" />
+                        Draft New Directive
+                    </h2>
+
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-[10px] uppercase tracking-wider text-brand-primary/80 font-bold mb-2 font-mono">Launch Date</label>
+                                <input type="date" value={activeDate} onChange={e => setActiveDate(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white outline-none focus:border-brand-primary text-sm" />
+                            </div>
+                            <div>
+                                <label className="block text-[10px] uppercase tracking-wider text-brand-primary/80 font-bold mb-2 font-mono">Fragment</label>
+                                <input type="text" placeholder="e.g. Nexus Core" value={fragmentName} onChange={e => setFragmentName(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white outline-none focus:border-brand-primary text-sm" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-[10px] uppercase tracking-wider text-brand-primary/80 font-bold mb-2 font-mono">Protocol Title</label>
+                            <input type="text" placeholder="Operation Awakening" value={title} onChange={e => setTitle(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white outline-none focus:border-brand-primary text-sm" />
+                        </div>
+
+                        <div>
+                            <label className="block text-[10px] uppercase tracking-wider text-brand-primary/80 font-bold mb-2 font-mono">Briefing (Newline = Next Slide)</label>
+                            <textarea rows={3} value={briefing} onChange={e => setBriefing(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white outline-none focus:border-brand-primary text-xs font-mono" />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-[10px] uppercase tracking-wider text-green-400 font-bold mb-2">Success Outcomes</label>
+                                <textarea rows={2} value={success} onChange={e => setSuccess(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white text-xs" />
+                            </div>
+                            <div>
+                                <label className="block text-[10px] uppercase tracking-wider text-red-400 font-bold mb-2">Failure Outcomes</label>
+                                <textarea rows={2} value={failure} onChange={e => setFailure(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white text-xs" />
+                            </div>
+                        </div>
+
+                        <button onClick={handleCreateMission} className="w-full glass-button bg-brand-primary text-black border-brand-primary font-black py-3 uppercase tracking-tighter flex items-center justify-center space-x-2 shadow-[0_0_20px_rgba(196,155,97,0.2)]">
+                            <Save className="w-4 h-4" />
+                            <span>Initialize Protocol</span>
+                        </button>
+                    </div>
+                </div>
+
+                {/* List View */}
+                <div className="space-y-4">
+                    <h2 className="text-lg font-bold text-white flex items-center mb-4 tracking-widest uppercase pl-2 font-mono">
+                        <Calendar className="w-5 h-5 text-brand-secondary mr-2" />
+                        Active Protocol Stream
+                    </h2>
+                    <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                        {missions.length === 0 ? <p className="text-white/30 italic px-2">No directives in orbit.</p> : null}
+                        {missions.map(m => (
+                            <div key={m.id} className="glass-panel p-4 flex items-center justify-between group bg-black/30 hover:bg-white/5 transition-all">
+                                <div>
+                                    <span className="text-[10px] font-mono text-brand-primary font-bold tracking-widest block mb-1">{m.active_date}</span>
+                                    <h3 className="font-bold text-white uppercase text-sm tracking-tight">{m.title}</h3>
+                                    <div className="mt-1 text-[10px] text-white/50">{m.fragment_name}</div>
+                                </div>
+                                <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onClick={() => setEditingMission(m)} className="p-2 bg-white/5 hover:bg-brand-primary/20 text-white hover:text-brand-primary rounded-lg transition-all border border-white/5 hover:border-brand-primary/30">
+                                        <Pencil className="w-4 h-4" />
+                                    </button>
+                                    <button onClick={() => handleDeleteMission(m.id)} className="p-2 bg-white/5 hover:bg-red-500/20 text-white hover:text-red-500 rounded-lg transition-all border border-white/5 hover:border-red-500/30">
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Edit Drawer Overlay */}
+            <AnimatePresence>
+                {editingMission && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex justify-end"
+                        onClick={() => setEditingMission(null)}
+                    >
+                        <motion.div
+                            initial={{ x: "100%" }}
+                            animate={{ x: 0 }}
+                            exit={{ x: "100%" }}
+                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                            className="w-full max-w-md h-full bg-[#0a0604] border-l border-white/10 shadow-2xl p-8 flex flex-col"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="flex items-center justify-between mb-8 pb-4 border-b border-brand-primary/20">
+                                <h3 className="text-xl font-bold font-heading text-white">Modify Directive</h3>
+                                <button onClick={() => setEditingMission(null)} className="p-2 hover:bg-white/5 rounded-full text-white/50 hover:text-white transition-colors">
+                                    <X className="w-6 h-6" />
+                                </button>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto space-y-6 pr-2 custom-scrollbar text-white">
+                                <div>
+                                    <label className="block text-[10px] uppercase tracking-wider text-brand-primary font-bold mb-2">Directive Title</label>
+                                    <input type="text" value={editingMission.title} onChange={e => setEditingMission({ ...editingMission, title: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white outline-none focus:border-brand-primary" />
+                                </div>
+
+                                <div>
+                                    <label className="block text-[10px] uppercase tracking-wider text-brand-primary font-bold mb-2">Target Fragment</label>
+                                    <input type="text" value={editingMission.fragment_name} onChange={e => setEditingMission({ ...editingMission, fragment_name: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white outline-none focus:border-brand-primary" />
+                                </div>
+
+                                <div>
+                                    <label className="block text-[10px] uppercase tracking-wider text-brand-primary font-bold mb-2">Briefing Sequence (Newline = Next Slide)</label>
+                                    <textarea rows={6} value={Array.isArray(editingMission.briefing_dialogue) ? editingMission.briefing_dialogue.join('\n') : editingMission.briefing_dialogue} onChange={e => setEditingMission({ ...editingMission, briefing_dialogue: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-xs font-mono outline-none focus:border-brand-primary resize-none" />
+                                </div>
+
+                                <div className="grid grid-cols-1 gap-4 text-white">
+                                    <div>
+                                        <label className="block text-[10px] uppercase tracking-wider text-green-400 font-bold mb-2">Success Outcome</label>
+                                        <textarea rows={2} value={Array.isArray(editingMission.success_dialogue) ? editingMission.success_dialogue.join('\n') : editingMission.success_dialogue} onChange={e => setEditingMission({ ...editingMission, success_dialogue: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-xs" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] uppercase tracking-wider text-red-400 font-bold mb-2">Failure Outcome</label>
+                                        <textarea rows={2} value={Array.isArray(editingMission.failure_dialogue) ? editingMission.failure_dialogue.join('\n') : editingMission.failure_dialogue} onChange={e => setEditingMission({ ...editingMission, failure_dialogue: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-xs" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button onClick={handleUpdateMission} className="w-full bg-brand-primary text-black font-black py-4 uppercase tracking-tighter mt-8 shadow-[0_0_30px_rgba(196,155,97,0.3)] hover:scale-[1.02] transition-transform">
+                                Commit Modifications
+                            </button>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 
@@ -461,6 +751,7 @@ export default function AdminDashboard() {
                 <div className="max-w-7xl mx-auto h-full">
                     {activeTab === 'overview' && renderOverview()}
                     {activeTab === 'users' && renderUserDirectory()}
+                    {activeTab === 'chronos' && renderChronosBreach()}
                     {activeTab === 'items' && <ItemsManager />}
                     {activeTab === 'announcements' && <AnnouncementsManager />}
                     {activeTab === 'seasons' && <SeasonsManager />}
